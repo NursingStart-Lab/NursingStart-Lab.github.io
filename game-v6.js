@@ -313,6 +313,7 @@ function doctorReport(kind){
  if(kind==="glucose"){
   let missing=[];
   if(!g.symptom)missing.push("主訴與伴隨症狀");
+  if(!g.onset)missing.push("症狀開始時間與持續情形");
   if(!g.meal)missing.push("進食間隔與早餐量");
   if(!g.objective)missing.push("意識、瞳孔與吞嚥評估");
   if(!g.bg)missing.push("實測血糖");
@@ -423,6 +424,12 @@ function drawModal(){
  if(a.allergy)html+='<div class="panel-answer"><b>藥物過敏史</b>：Vancomycin HCl／Skin rash</div>';
  if(a.renal)html+='<div class="panel-answer"><b>Cr</b>：0.8 mg/dL　<b>eGFR</b>：96 mL/min/1.73 m²</div>';
  
+ }else if(modal.startsWith("need:")){
+  const kind=modal.slice(5),r=doctorReport(kind);
+  title="217 床｜通報前確認";
+  html=box("護理師內心 OS","你還沒做完整評估，現在報告醫師，資訊仍不足。")+
+   noteBox("<b>尚需補充：</b>"+r.missing.join("、"))+
+   pbtn("返回病人旁，先完成評估與必要處置","close");
  }else if(modal.startsWith("doc:")){
   const kind=modal.slice(4),r=doctorReport(kind);if(!r)return;
   title=r.title;
@@ -453,10 +460,10 @@ function drawModal(){
    pbtn("Famotidine：核對適應症並回應用藥疑慮","217:famotidine")+
    pbtn("Aspirin：先評估出血風險並通報確認給藥","217:aspirinMenu");
  }else if(modal==="aspirinMenu"){
-  title="217 床｜Aspirin 給藥安全";html=box("用藥決策","病人已有便色偏深線索。你會如何處理 Aspirin？")+
-  pbtn("先完成出血評估與醫師通報，待確認後依醫囑處理","aspirin:safe")+
-  pbtn("既然是原醫囑，就不評估直接給藥","aspirin:unsafe")+
-  pbtn("未評估、未通報，永久停藥","aspirin:stop");
+  title="217 床｜Aspirin 給藥安全";
+  html=box("用藥決策","已出現疑似出血線索，你會如何決定本次 Aspirin 給藥？")+
+  pbtn("因有原醫囑，就不確認異常直接給藥","aspirin:unsafe")+
+  pbtn("先完成出血評估、醫師通報及核對，再依醫囑處理","aspirin:safe");
  }else if(modal==="abxDecision"){
   title="Cefepime｜醫囑安全查核";
   html=pbtn("核對培養、藥敏、過敏、腎功能及有效醫囑，釐清缺漏後準備","abx:safe")+
@@ -570,7 +577,19 @@ function act(token){
  if(a==="219"){do219(b);return}
  if(a==="220"){do220(b);return}
  if(a==="modal"){openModal(b==="cart"?"cart":b);return}
- if(a==="doc"){openModal("doc:"+b);return}
+ if(a==="doc"){
+  if(b==="glucose"||b==="aspirin"){
+   const r=doctorReport(b);
+   if(r&&r.missing.length){
+    const v=s.b217;
+    if(b==="glucose")v.glucosePrompted=true;
+    else v.aspirPrompted=true;
+    note("217 床提早通報嘗試",b+"：評估尚未完整："+r.missing.join("、"));
+    openModal("need:"+b);return;
+   }
+  }
+  openModal("doc:"+b);return;
+ }
  if(a==="report"){report(b);return}
  if(a==="glucose"){
   const v=s.b217;
