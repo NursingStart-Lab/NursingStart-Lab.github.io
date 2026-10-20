@@ -24,7 +24,30 @@ const INIT=()=>({
 });
 let s=INIT(),modal="";
 function save(){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
-function restore(){try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(d&&d.version===6&&d.b217&&d.b219&&d.b220&&d.abx&&Array.isArray(d.log)){s=d;return true}}catch(e){}return false}
+function restore(){
+ try{
+  const d=JSON.parse(localStorage.getItem(KEY)||"null");
+  if(d&&d.version===6&&d.b217&&d.b219&&d.b220&&d.abx&&Array.isArray(d.log)){
+   const g=d.b217,i=d.b219,w=d.b220;
+   if(!g.medQuiz)g.medQuiz={index:0,firstCorrect:0,answer:"",done:false};
+   if(!g.focus){
+    g.focus=g.aspirinPlan?"aspirinPlan":
+     g.aspirReport?"aspirReported":g.aspReview?"aspReview":g.vital?"vital":
+     g.bruise?"bruise":g.stoolDetail?"stoolDetail":g.stool?"stool":
+     g.glucoseReported?"glucoseReported":g.food?"food":g.bg?"bg":
+     g.meal?"meal":g.objective?"objective":g.onset?"onset":g.symptom?"clarify":"start";
+   }
+   if(!i.focus)i.focus=i.injuryFollow?"injuryFollow":i.aftercare?"aftercare":i.rate?"rate":
+     i.decision==="replace"?"replace":i.decision==="ignore"?"ignored":
+     i.site?"site":i.asked?"ask":i.painPrompted?"painPrompted":"start";
+   if(!w.focus)w.focus=w.follow?"follow":w.report?"reported":w.acetViewed?"acet":
+     w.positioned?"position":w.exam?"exam":w.arm?"arm":w.triggers?"triggers":
+     w.score?"score":w.onset?"onset":"start";
+   s=d;save();return true;
+  }
+ }catch(e){}
+ return false;
+}
 function time(){const m=s.minute;return String(9+Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
 function tick(m=1){s.minute+=m;if(s.b219.decision==="ignore"&&!s.b219.injury&&s.minute>=(s.b219.injuryMinute||0)+6)s.b219.injury=true}
 function note(label,value){s.log.push({time:time(),place:s.place,label,value});save()}
