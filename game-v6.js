@@ -5,12 +5,12 @@ const KEY="nursestart-lab-ward-v6";
 const ITEMS=[
  ["gAssess","217｜血糖相關評估"],["gAction","217｜血糖處置與追蹤安排"],["gReport","217｜向陳醫師通報血糖"],
  ["aAssess","217｜Aspirin 出血風險評估"],["aReport","217｜向陳醫師通報疑似出血"],["med217","217｜用藥安全核對"],
- ["ivAssess","219｜主動留置針檢查"],["ivDecision","219｜留置針異常處置"],["ivRate","219｜輸液醫囑與滴速核對"],
+ ["interrupt","跨床中斷與任務安排"],["ivAssess","219｜主動留置針檢查"],["ivDecision","219｜留置針異常處置"],["ivRate","219｜輸液醫囑與滴速核對"],
  ["shoulderAssess","220｜疼痛評估"],["shoulderCare","220｜患側支托與衛教"],["shoulderReport","220｜向林醫師通報"],
  ["culture","新抗生素醫囑查證"],["sterile","無菌備藥流程"],["return","跨床追蹤與再評估"]
 ];
 const INIT=()=>({
- version:6,place:"start",minute:0,firstPlace:"",log:[],score:{},feedback:"",
+ version:6,place:"start",minute:0,firstPlace:"",log:[],score:{},feedback:"",bell:false,bellHandled:false,handoff:false,
  b217:{intro:false,line:"",symptom:false,onset:false,meal:false,objective:false,swallow:false,bg:false,bgMinute:0,
   food:false,glucoseReported:false,glucosePrompted:false,gPriorUnsafe:false,recheck:false,recheckValue:null,
   stool:false,stoolDetail:false,bruise:false,vital:false,aspReview:false,aspirReport:false,aspirPrompted:false,
@@ -38,6 +38,12 @@ function move(place){
  if(!["bed217","bed219","bed220","desk","med"].includes(place))return;
  closeModal();if(s.place!=="start"&&s.place!==place)note("離開床位","前往 "+place+"；保留原床資料");
  if(!s.firstPlace)s.firstPlace=place;
+ if(place==="bed219"&&s.bell&&!s.bellHandled){
+  const g=s.b217;
+  const grade=!g.food?0:(s.handoff?2:1);
+  point("interrupt",grade,grade===2?"先安排 217 床追蹤再前往":grade===1?"直接前往 219 床，尚未安排明確追蹤":"離開時 217 床仍有重要未處置問題");
+  s.bellHandled=true;note("跨床呼叫","到 219 床處理呼叫鈴");
+ }
  if(s.place==="bed219"&&place!=="bed219"){
   const v=s.b219;
   if(!v.site&&!v.painPrompted){v.painPrompted=true;note("219病人提醒","未檢查留置針，病人說左手有點痛")}
@@ -55,6 +61,7 @@ function header(title,sub){$("ctitle").textContent=title;$("csub").textContent=s
 function status(){
  let items=[];
  if(s.b217.bg&&!s.b217.recheck)items.push("217 床：血糖待追蹤");
+ if(s.bell&&!s.bellHandled)items.push("219 床：呼叫鈴響起");
  if(s.b217.stool&&!s.b217.aspirReport)items.push("217 床：Aspirin 風險待確認");
  if(s.b219.injury&&!s.b219.injuryFollow)items.push("219 床：輸液部位需再評估");
  if(s.b220.onset&&!s.b220.report)items.push("220 床：肩痛尚待評估／通報");
@@ -70,6 +77,7 @@ function render217(){
  const v=s.b217;
  header("217 床｜臨床評估與給藥","腦中風住院｜進度會依實際詢問、測量及處置保存");
  let h=box("217 床病人",v.line||"護理師，我覺得不太舒服，昨天沒有這樣。");
+ if(s.bell&&!s.bellHandled){h+=box("🔔 219 床按鈴","219 床正在呼叫護理師。你要如何安排 217 床的後續追蹤？");h+=choices(btn("先確認 217 床複測與追蹤已安排，再去 219 床","217:handoff"),btn("直接前往 219 床","go:bed219"));}
  const q=[];
  if(!v.symptom)q.push(btn("「可以再描述清楚一點嗎？哪裡不舒服、什麼感覺，之前有發生過嗎？」","217:clarify"));
  if(v.symptom&&!v.onset)q.push(btn("「手抖、心悸是什麼時候開始？還有沒有其他不舒服？」","217:onset"));
@@ -95,7 +103,7 @@ function render217(){
 function render219(){
  const v=s.b219;v.visited=true;
  header("219 床｜周邊靜脈輸液","一般重力滴注；護理師推工作車，無輸液幫浦及特殊雙人核對關卡");
- let h=box("219 床病人",v.line||"護理師，早安。");
+ let h=box("219 床病人",v.line||(s.bellHandled?"護理師，早安，可以幫我看看點滴嗎？":"護理師，早安。"));
  if(v.injury&&!v.injuryFollow){
   h+=box("稍後的病況變化","原穿刺處周圍紅斑擴大、局部溫度升高並出現壓痛，病人表示手越來越痛。疑似靜脈炎進展。");
   h+=choices(btn("停止使用原通路，移除留置針，評估、照護及通報","219:injuryFollow"),btn("依舊覺得還可以滴，繼續使用","219:ignoreAgain"));return h;
@@ -178,7 +186,7 @@ function renderEnd(){
 function render(){
  if(!$("game"))return;
  $("clock").textContent=time();coords();
- $("bell").classList.toggle("hidden",!(s.b219.injury&&!s.b219.injuryFollow));
+ $("bell").classList.toggle("hidden",!((s.bell&&!s.bellHandled)||(s.b219.injury&&!s.b219.injuryFollow)));
  let html="";
  switch(s.place){
  case "start":html=renderStart();break;case "bed217":html=render217();break;
@@ -205,7 +213,7 @@ function doctorReport(kind){
   if(!g.food)missing.push("已採取的立即處置");
   const lines=[
   "陳醫師您好，我是病房護理師，跟您報告 217 床病人。",
-  "病人因腦中風入院，剛剛主訴手抖、心悸，昨天沒有這種情形。",
+  g.symptom?"病人因腦中風入院，剛剛主訴手抖、心悸，昨天沒有這種情形。":"病人因腦中風入院，目前病況仍需進一步評估。",
   g.meal?"昨晚睡前到現在約九小時沒有正常進食，今天早上只喝幾口豆漿。":"",
   g.objective?"目前 GCS E4V5M6，Pupil size 2.0 mm (+) OU，已評估意識及安全吞嚥。":"",
   g.bg?"使用 OneTouch 測得血糖 68 mg/dL。":"",
@@ -332,6 +340,7 @@ function do217(k){
  if(k==="objective"){v.objective=true;v.swallow=true;v.line="客觀評估：GCS E4V5M6，Pupil size 2.0 mm (+) OU；意識清楚、可正常對答，完成吞嚥安全評估。";note("217客觀評估","意識、瞳孔及安全吞嚥")}
  if(k==="meal"){v.meal=true;v.line="昨晚睡前到現在大概九個小時都沒正常吃東西，早上只喝幾口豆漿。";note("217進食詢問","約九小時未正常進食")}
  if(k==="bg"){v.bg=true;v.bgMinute=s.minute;v.line="床邊 OneTouch 血糖數值：68 mg/dL。";note("217血糖","實際測得 68 mg/dL")}
+ if(k==="handoff"){s.handoff=true;note("217追蹤交接","確認血糖複測與症狀追蹤、安排必要協助");render();return}
  if(k==="glucoseMenu"){openModal("glucose");return}
  if(k==="recheck"){
   if(s.minute<v.bgMinute+15){v.line="血糖處置後仍需等到安排的複測時點；期間請持續觀察症狀。";note("血糖追蹤","複測時點尚未到");}
@@ -381,11 +390,9 @@ function report(kind){
   if(kind==="aspirin")v.aspirPrompted=true;
   if(kind==="shoulder"){v.prompted=true;v.firstPremature=true;}
   note("醫師追問",r.doctor+"詢問缺漏："+r.missing.join("、"));
-  if(kind==="glucose")point("gReport",0,"首次通報資料不完整");
-  if(kind==="aspirin")point("aReport",0,"首次通報資料不完整");
-  if(kind==="shoulder")point("shoulderReport",0,"首次通報資料不完整");
+  note("初次通報資訊不完整","醫師追問後需要補齊資料；若最終沒有完成將保持未完成");
  }else{
-  if(kind==="glucose"){v.glucoseReported=true;point("gReport",v.glucosePrompted?1:2,"完成簡短血糖電話通報");}
+  if(kind==="glucose"){v.glucoseReported=true;s.bell=true;point("gReport",v.glucosePrompted?1:2,"完成簡短血糖電話通報");note("219床呼叫鈴","217 床已安排通報，另床發出呼叫");}
   if(kind==="aspirin"){v.aspirReport=true;point("aAssess",v.stoolDetail&&v.bruise&&v.vital?2:1,"完成出血風險資料蒐集");point("aReport",v.aspirPrompted?1:2,"完成 Aspirin 疑似出血通報");}
   if(kind==="shoulder"){v.report=true;point("shoulderAssess",v.onset&&v.score&&v.triggers&&v.arm&&v.exam?2:1,"完成疼痛及患側評估");point("shoulderReport",v.prompted?1:2,"向林醫師報告左肩疼痛與藥膏需求");}
   note("醫師通報",r.doctor+"收到完整病況，未擅自代醫師開立新處置");
@@ -404,10 +411,10 @@ function act(token){
  if(a==="glucose"){
   const v=s.b217;
   if(b==="meal"||b==="protocol"){
-   const safe=v.objective&&v.bg;const score=safe?(v.glucosePrompted?1:2):1;
-   v.food=true;v.line="已確認可安全吞嚥，先請病人進食早餐，並同步向陳醫師通報；後續須按臨床指引追蹤低血糖。";
-   note("217處置","先請病人吃早餐並同步通報，安排血糖追蹤");
-   point("gAssess",v.objective&&v.meal?2:1,"完成意識、吞嚥、進食與血糖評估");
+   const safe=v.objective&&v.bg;const score=safe?(v.glucosePrompted?1:2):0;
+   if(safe){v.food=true;v.line="已確認可安全吞嚥，先請病人進食早餐，並同步向陳醫師通報；後續須按臨床指引追蹤低血糖。";note("217處置","先請病人吃早餐並同步通報，安排血糖追蹤");}
+   else{v.glucosePrompted=true;v.line="尚未完成當下意識與安全吞嚥評估，不能直接認定可以安全口服；請先補做必要評估。";note("217安全提示","進食前需完成吞嚥與意識評估");}
+   point("gAssess",v.objective&&v.meal?2:1,"進食、意識與血糖相關資訊查證");
    point("gAction",score,"首次處置選擇；教學仍需依院內 SOP 驗證");
   }else{
    v.gPriorUnsafe=true;v.glucosePrompted=true;point("gAction",0,"未做適當評估或未通報複測");
