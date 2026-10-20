@@ -4,20 +4,20 @@ const $=id=>document.getElementById(id);
 const KEY="nursestart-lab-ward-v6";
 const ITEMS=[
  ["gAssess","217｜血糖相關評估"],["gAction","217｜血糖處置與追蹤安排"],["gReport","217｜向陳醫師通報血糖"],
- ["aAssess","217｜Aspirin 出血風險評估"],["aReport","217｜向陳醫師通報疑似出血"],["med217","217｜用藥安全核對"],
+ ["aAssess","217｜Aspirin 出血風險評估"],["famotidine","217｜仿單查閱與三藥作用配對"],["aReport","217｜向陳醫師通報疑似出血"],["med217","217｜用藥安全核對"],
  ["interrupt","跨床中斷與任務安排"],["ivAssess","219｜主動留置針檢查"],["ivDecision","219｜留置針異常處置"],["ivRate","219｜輸液醫囑與滴速核對"],
  ["shoulderAssess","220｜疼痛評估"],["shoulderCare","220｜患側支托與衛教"],["shoulderReport","220｜向林醫師通報"],
  ["culture","新抗生素醫囑查證"],["sterile","無菌備藥流程"],["return","跨床追蹤與再評估"]
 ];
 const INIT=()=>({
  version:6,place:"start",minute:0,firstPlace:"",log:[],score:{},feedback:"",bell:false,bellHandled:false,handoff:false,
- b217:{intro:false,line:"",symptom:false,onset:false,meal:false,objective:false,swallow:false,bg:false,bgMinute:0,
+ b217:{intro:false,line:"",focus:"start",medQuiz:{index:0,firstCorrect:0,answer:"",done:false},symptom:false,onset:false,meal:false,objective:false,swallow:false,bg:false,bgMinute:0,
   food:false,glucoseReported:false,glucosePrompted:false,gPriorUnsafe:false,recheck:false,recheckValue:null,
   stool:false,stoolDetail:false,bruise:false,vital:false,aspReview:false,aspirReport:false,aspirPrompted:false,
   aspirinPlan:false,metforminChecked:false,famotidineChecked:false,otherOpen:false},
- b219:{visited:false,line:"",site:false,asked:false,red:false,painPrompted:false,ratePrompted:false,
+ b219:{visited:false,line:"",focus:"start",site:false,asked:false,red:false,painPrompted:false,ratePrompted:false,
   decision:"",injury:false,injuryMinute:null,injuryFollow:false,rate:false,lineRemoved:false,aftercare:false},
- b220:{visited:false,line:"",onset:false,score:false,triggers:false,arm:false,exam:false,positioned:false,
+ b220:{visited:false,line:"",focus:"start",onset:false,score:false,triggers:false,arm:false,exam:false,positioned:false,
   acetViewed:false,report:false,prompted:false,firstPremature:false,follow:false},
  abx:{order:false,culture:false,allergy:false,renal:false,decision:"",step:0,wrong:[],finished:false},
  lastDoctor:"",gameEnded:false
@@ -61,9 +61,9 @@ function move(place){
  s.place=place;tick(2);render();
 }
 function coords(){
- const p={start:[49,66],bed217:[19,27],bed219:[80,27],bed220:[19,61],desk:[24,89],med:[76,89]}[s.place]||[49,66];
+ const p={start:[49,66],bed217:[18,26],bed219:[51,26],bed220:[84,26],desk:[26,80],med:[76,80]}[s.place]||[49,66];
  $("nurse").style.left=p[0]+"%";$("nurse").style.top=p[1]+"%";
- $("cart").style.left=(p[0]+9)+"%";$("cart").style.top=(p[1]+2)+"%";
+ $("cart").style.left=(p[0]+5)+"%";$("cart").style.top=(p[1]+2)+"%";
 }
 function header(title,sub){$("ctitle").textContent=title;$("csub").textContent=sub}
 function status(){
@@ -83,32 +83,45 @@ function renderStart(){
 }
 function render217(){
  const v=s.b217;
- header("217 床｜臨床評估與給藥","腦中風住院｜進度會依實際詢問、測量及處置保存");
- let h=box("217 床病人",v.line||"護理師，我覺得不太舒服，昨天沒有這樣。");
- if(s.bell&&!s.bellHandled){h+=box("🔔 219 床按鈴","219 床正在呼叫護理師。你要如何安排 217 床的後續追蹤？");h+=choices(btn("先確認 217 床複測與追蹤已安排，再去 219 床","217:handoff"),btn("直接前往 219 床","go:bed219"));}
- if(v.bg)h+=noteBox("已取得：床邊血糖 68 mg/dL；"+(v.food?"已安排進食及通報，":"尚待安全處置，")+(v.recheck?"已完成複測。":"需追蹤複測。"));
- if(v.stoolDetail)h+=noteBox("先前訪談：昨晚排便一次、便色偏黑而黏，仍須結合其他評估判斷。");
- const q=[];
- if(!v.symptom)q.push(btn("「可以再描述清楚一點嗎？哪裡不舒服、什麼感覺，之前有發生過嗎？」","217:clarify"));
- if(v.symptom&&!v.onset)q.push(btn("「手抖、心悸是什麼時候開始？還有沒有其他不舒服？」","217:onset"));
- if(!v.objective)q.push(btn("執行意識、瞳孔與吞嚥安全評估","217:objective"));
- if(v.symptom&&!v.meal)q.push(btn("「今天早上吃了什麼？從昨天到現在吃了多少？」","217:meal"));
- if(v.symptom&&!v.bg)q.push(btn("執行床邊 OneTouch 血糖測量","217:bg"));
- if(v.bg&&!v.food)q.push(btn("針對血糖 68 mg/dL 採取處置","217:glucoseMenu"));
- if(v.bg&&!v.glucoseReported)q.push(btn("電話通報陳醫師｜血糖與症狀","doc:glucose"));
- if(v.bg&&v.food&&!v.recheck)q.push(btn(s.minute>=v.bgMinute+15?"複測床邊血糖並評估症狀":"安排血糖複測及返回追蹤（需至少 15 分鐘）","217:recheck"));
- if(v.symptom&&!v.stool)q.push(btn("「除了手抖，還有沒有其他不舒服，最近排便情形如何？」","217:stool"));
- if(v.stool&&!v.stoolDetail)q.push(btn("「便色是深褐色還是偏黑？形狀、次數與大約的量呢？」","217:stoolDetail"));
- if(v.stool&&!v.bruise)q.push(btn("詢問其他出血徵象並檢查皮膚瘀青","217:bruise"));
- if(v.stool&&!v.vital)q.push(btn("測量生命徵象，評估是否有血流動力學異常","217:vital"));
- if(v.stool&&!v.aspReview)q.push(btn("檢視 Aspirin 近期給藥紀錄與醫囑","217:aspReview"));
- if(v.stool&&!v.aspirReport)q.push(btn("電話通報陳醫師｜深色便與 Aspirin","doc:aspirin"));
- if(v.stool&&!v.aspirinPlan)q.push(btn("記錄 Aspirin 給藥前安全判斷","217:aspirinMenu"));
- if(!v.metforminChecked||!v.famotidineChecked)q.push(btn("核對 Metformin／Famotidine 用藥條件","217:medMenu"));
- q.push(btn("打開手推護理工作車（217 床 MAR）","modal:cart"),btn("返回護理站查閱資料","go:desk"));
- h+=choices(...q);
- if(v.bg&&v.recheck)h+=noteBox("最新追蹤：複測血糖 "+v.recheckValue+" mg/dL，已重新確認當下症狀；需持續依醫囑追蹤。");
- return h;
+ header("217 床｜臨床評估與給藥","每次先呈現一段對話；可跨床返回接續。");
+ const focus=v.focus||"start";
+ let line=v.line||"護理師，我覺得不太舒服，昨天沒有這樣。",a=[];
+ if(focus==="start"){line="護理師，我覺得不太舒服，昨天沒有這樣。";
+   a=[btn("「可以請您再描述清楚一點嗎？是哪裡不舒服、什麼感覺？」","217:clarify"),btn("先評估意識狀態及瞳孔反應","217:objective")];}
+ else if(focus==="clarify"){a=[btn("「手抖、心悸是什麼時候開始的？」","217:onset"),btn("執行意識、瞳孔與吞嚥安全評估","217:objective")];}
+ else if(focus==="onset"){a=[btn("執行意識、瞳孔與吞嚥安全評估","217:objective"),btn("「早上吃了什麼？距離上次正常進食多久？」","217:meal")];}
+ else if(focus==="objective"){a=[btn(v.meal?"執行床邊 OneTouch 血糖測量":"「早上吃了什麼？距離上次正常進食多久？」",v.meal?"217:bg":"217:meal")];}
+ else if(focus==="meal"){a=[btn(v.objective?"執行床邊 OneTouch 血糖測量":"執行意識、瞳孔與吞嚥安全評估",v.objective?"217:bg":"217:objective")];}
+ else if(focus==="bg"){a=[btn("針對血糖 68 mg/dL 採取當下處置","217:glucoseMenu"),btn("電話通報陳醫師","doc:glucose")];}
+ else if(focus==="glucoseUnsafe"){a=[btn("重新評估並處理症狀性低血糖","217:glucoseMenu")];}
+ else if(focus==="food"){a=[btn("電話通報陳醫師｜217 床血糖","doc:glucose")];}
+ else if(focus==="glucoseReported"){a=[btn("接續了解其他症狀與排便情形","217:stool")];}
+ else if(focus==="stool"){a=[btn("「便色是深褐色還是黑色？較黏嗎？排了幾次？」","217:stoolDetail")];}
+ else if(focus==="stoolDetail"){a=[btn("檢查皮膚瘀青，詢問其他出血徵象","217:bruise")];}
+ else if(focus==="bruise"){a=[btn("測量生命徵象","217:vital")];}
+ else if(focus==="vital"){a=[btn("核對 Aspirin 醫囑與近期用藥紀錄","217:aspReview")];}
+ else if(focus==="aspReview"){a=[btn("向陳醫師報告排便變化及 Aspirin 用藥","doc:aspirin")];}
+ else if(focus==="aspirReported"){a=[btn("確認本次 Aspirin 給藥安全","217:aspirinMenu")];}
+ else if(focus==="aspirinPlan"){line="護理師，我現在又沒有胃痛，為什麼還要吃胃藥？";
+  a=[btn("開啟藥品仿單，查閱三種藥物的作用","modal:leaflet")];}
+ else if(focus==="medQuiz"){
+  const q=[
+   {name:"Aspirin 1 cap PO QD",options:[["抗血小板作用，降低血栓形成風險","asp"],["抑制胃酸分泌","fam"],["協助控制血糖","met"]]},
+   {name:"Famotidine 1 tab PO BID",options:[["降低血栓形成風險","asp"],["抑制胃酸分泌","fam"],["治療高血壓","nor"]]},
+   {name:"Metformin 1 tab PO BID",options:[["促進排尿","diu"],["降低胃酸","fam"],["協助控制血糖","met"]]}
+  ][Math.min(v.medQuiz.index,2)];
+  line="請從剛剛查閱的仿單，判斷「"+q.name+"」的主要作用。";
+  a=q.options.map(x=>btn(x[0],"quiz:"+x[1]));
+ }
+ else if(focus==="medQuizAnswer"){line=v.medQuiz.answer;a=[btn(v.medQuiz.index>=3?"完成藥物作用查證與衛教":"繼續下一種藥物","quiz:next")];}
+ else if(focus==="done"){line="已完成目前的症狀評估與藥物作用說明，請留意後續追蹤。";
+   a=[btn("檢視工作及學習紀錄","end:review")];}
+ else if(focus==="recheck"){a=[btn("繼續評估排便與 Aspirin 用藥安全","217:stool")];}
+ if(v.bg&&!v.recheck&&s.minute>=v.bgMinute+15&&focus!=="medQuiz"&&focus!=="medQuizAnswer"&&focus!=="recheck"&&a.length<2)
+  a.push(btn("按時複測血糖與追蹤症狀","217:recheck"));
+ let h=box(focus==="objective"||focus==="bg"||focus==="vital"?"床旁評估結果":focus==="medQuiz"?"藥品作用配對":"217 床病人",line);
+ if(v.bg&&focus!=="bg"&&focus!=="start")h+='<div class="interaction-note">已測血糖 68 mg/dL'+(v.recheck?"｜複測 "+v.recheckValue+" mg/dL":"｜待追蹤")+"</div>";
+ return h+(a.length?choices(...a):"");
 }
 function render219(){
  const v=s.b219;v.visited=true;
