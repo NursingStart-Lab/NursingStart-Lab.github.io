@@ -4,7 +4,7 @@ const $=id=>document.getElementById(id);
 const KEY="nursestart-lab-ward-v6";
 const ITEMS=[
  ["gAssess","217｜血糖相關評估"],["gAction","217｜血糖處置與追蹤安排"],["gReport","217｜向陳醫師通報血糖"],
- ["aAssess","217｜Aspirin 出血風險評估"],["famotidine","217｜仿單查閱與三藥作用配對"],["aReport","217｜向陳醫師通報疑似出血"],["med217","217｜用藥安全核對"],
+ ["aAssess","217｜Aspirin 出血風險評估"],["famotidine","217｜Aspirin 藥品作用查證"],["aReport","217｜向陳醫師通報疑似出血"],["med217","217｜用藥安全核對"],
  ["interrupt","跨床中斷與任務安排"],["ivAssess","219｜主動留置針檢查"],["ivDecision","219｜留置針異常處置"],["ivRate","219｜輸液醫囑與滴速核對"],
  ["shoulderAssess","220｜疼痛評估"],["shoulderCare","220｜患側支托與衛教"],["shoulderReport","220｜向林醫師通報"],
  ["culture","新抗生素醫囑查證"],["sterile","無菌備藥流程"],["return","跨床追蹤與再評估"]
@@ -175,21 +175,17 @@ function render217(){
   a=pair("217:aspirinMenu","依評估及醫師回覆確認本次 Aspirin 給藥安全",
     "217:wrongAspirReported","未取得後續醫囑，直接自行決定永久停 Aspirin");
  }else if(focus==="aspirinPlan"){
-  line="護理師，我現在又沒有胃痛，為什麼還要吃胃藥？";
-  a=pair("modal:leaflet","開啟藥物作用資料，查證 Famotidine 的用途",
-    "217:wrongFamotidine","只告訴病人「醫師有開，照吃就對了」",true);
- }else if(focus==="medQuiz"){
-  const quizzes=[
-   {name:"Aspirin 1 cap PO QD",answer:"asp",options:[["抗血小板，降低血栓形成風險","asp"],["抑制胃酸分泌","fam"]]},
-   {name:"Famotidine 1 tab PO BID",answer:"fam",options:[["抗血小板，降低血栓形成風險","asp"],["抑制胃酸分泌","fam"]]},
-   {name:"Metformin 1 tab PO BID",answer:"met",options:[["協助控制血糖","met"],["治療高血壓","nor"]]}
-  ];
-  const q=quizzes[Math.min(v.medQuiz.index,2)];
-  line="請根據剛剛查閱的藥品資料，判斷「"+q.name+"」主要的藥理作用。";
-  a=q.options.map(x=>btn(x[0],"quiz:"+x[1]));
+  line="已完成 Aspirin 給藥前安全判斷，後續仍須依醫師回覆與有效醫囑追蹤。";
+  a=[btn("接續巡房及其他照護工作","217:finish")];
+ }
+ else if(focus==="medQuiz"){
+  line="查看 Aspirin 1 cap PO QD 的資料後，你認為它的主要作用是什麼？";
+  a=[btn("抗血小板作用，降低血栓形成風險","quiz:asp"),btn("抑制胃酸分泌","quiz:fam")];
  }else if(focus==="medQuizAnswer"){
-  line=v.medQuiz.answer;a=[btn(v.medQuiz.index>=3?"完成作用查證及衛教":"繼續下一種藥物","quiz:next")];
- }else if(focus==="feedback"){
+  line=v.medQuiz.answer;
+  a=[btn("返回剛才的照護進度","quiz:next")];
+ }
+ else if(focus==="feedback"){
   line=v.lastFeedback||"需要補充目前未完成的評估。";
   a=[btn("回到病人旁，補充評估後再決定","217:resume")];
  }else if(focus==="done"){
@@ -408,7 +404,7 @@ function drawModal(){
     '<tr><th>Aspirin</th><td>1 cap PO QD</td></tr>'+
     '<tr><th>Famotidine</th><td>1 tab PO BID</td></tr>'+
     '<tr><th>Metformin</th><td>1 tab PO BID</td></tr></table>'+
-    pbtn("開啟三種藥物的仿單作用說明","quiz:openLeaflet");
+    pbtn("查閱 Aspirin 藥物作用與仿單","quiz:openLeaflet");
   }
  
  }else if(modal==="ehr217"){
@@ -469,7 +465,7 @@ function drawModal(){
     '<tr><th>Metformin</th><td>協助控制血糖</td></tr></table>'+
     '<p class="panel-info">這裡為作用重點；正式藥品仿單依實際廠牌與許可證查詢。</p>'+
     '<p><a href="https://mcp.fda.gov.tw/" target="_blank" rel="noopener noreferrer">開啟食藥署正式藥品仿單查詢平台 ↗</a></p>'+
-    pbtn("逐一確認三種藥物的作用","quiz:start");
+    pbtn("辨識 Aspirin 的主要作用","quiz:start");
  }else if(modal==="glucose"){
   title="217 床｜血糖 68 mg/dL";
   html='<div class="panel-answer"><b>當下資料：</b> '+(g.objective?"GCS E4V5M6，Pupil size 2.0 mm (+) OU，已評估吞嚥安全。":"尚未完成意識與吞嚥安全評估。")+' 手抖、心悸。</div>'+
@@ -528,6 +524,7 @@ function do217(k){
  if(k==="objective"){v.objective=true;v.swallow=true;v.line="客觀評估：GCS E4V5M6，Pupil size 2.0 mm (+) OU；意識清楚、可正常對答，完成吞嚥安全評估。";note("217客觀評估","意識、瞳孔及安全吞嚥")}
  if(k==="meal"){v.meal=true;v.line="昨晚睡前到現在大概九個小時都沒正常吃東西，早上只喝幾口豆漿。";note("217進食詢問","約九小時未正常進食")}
  if(k==="bg"){v.bg=true;v.bgMinute=s.minute;v.line="床邊 OneTouch 血糖數值：68 mg/dL。";note("217血糖","實際測得 68 mg/dL");point("gAssess",!v.symptom||!v.objective||!v.meal?0:v.gMistakes===0?2:v.gMistakes===1?1:0,"症狀、客觀評估、進食及血糖量測的首次判斷");}
+ if(k==="finish"){v.focus="done";note("217本階段","完成給藥判斷，後續追蹤仍待完成");render();return;}
  if(k==="handoff"){s.handoff=true;note("217追蹤交接","確認血糖複測與症狀追蹤、安排必要協助");render();return}
  if(k==="glucoseMenu"){openModal("glucose");return}
  if(k==="recheck"){
@@ -631,24 +628,21 @@ function act(token){
   const v=s.b217,q=v.medQuiz;
   if(b==="start"){
    q.index=0;q.firstCorrect=0;q.answer="";q.done=false;
-   v.focus="medQuiz";note("藥品仿單","查閱三種藥物作用，準備逐一配對");
+   v.quizReturnFocus=v.focus;
+   v.focus="medQuiz";note("藥品作用查證","閱讀 Aspirin 的資料並進行單項配對");
    closeModal();render();return;
   }
   if(b==="next"){
-   if(q.index>=3){
-    q.done=true;v.focus="done";
-    point("famotidine",q.firstCorrect===3?2:q.firstCorrect>=2?1:0,"藥物作用三題，首次正確 "+q.firstCorrect+"/3");
-    note("病人衛教","說明 Famotidine 為抑制胃酸分泌，不需有胃痛才能有用藥適應症");
-   }else v.focus="medQuiz";
+   q.done=true;v.focus=v.quizReturnFocus||"aspirinPlan";
+   point("famotidine",q.firstCorrect===1?2:0,"Aspirin 作用首次選擇："+(q.firstCorrect===1?"正確":"不正確"));
+   note("藥品查證","返回先前評估節點："+v.focus);
    render();return;
   }
-  const expected=["asp","fam","met"][q.index];const right=b===expected;
-  if(right)q.firstCorrect++;
-  q.index++;
-  v.focus="medQuizAnswer";
-  q.answer=(right?"✓ 作用配對正確。":"需要再確認藥物作用。")+
-   "　"+(["Aspirin：抗血小板作用，降低血栓形成風險。","Famotidine：抑制胃酸分泌。","Metformin：協助控制血糖。"][q.index-1]);
-  note("藥品作用配對","第 "+q.index+" 種藥物首次選擇："+b+(right?"（正確）":"（需補充）"));
+  const correct=b==="asp";
+  q.firstCorrect=correct?1:0;
+  q.answer=correct?"作用配對正確：Aspirin 具有抗血小板作用。":"作用配對不正確：Aspirin 的主要作用是抗血小板，Famotidine 才是抑制胃酸分泌。";
+  q.index=1;v.focus="medQuizAnswer";
+  note("Aspirin 作用判斷",correct?"首次辨識正確":"首次辨識不正確，已提供正確作用");
   render();return;
  }
  if(a==="aspirin"){
