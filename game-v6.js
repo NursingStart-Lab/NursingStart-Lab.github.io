@@ -90,8 +90,8 @@ function render217(){
    a=[btn("「可以請您再描述清楚一點嗎？是哪裡不舒服、什麼感覺？」","217:clarify"),btn("先評估意識狀態及瞳孔反應","217:objective")];}
  else if(focus==="clarify"){a=[btn("「手抖、心悸是什麼時候開始的？」","217:onset"),btn("執行意識、瞳孔與吞嚥安全評估","217:objective")];}
  else if(focus==="onset"){a=[btn("執行意識、瞳孔與吞嚥安全評估","217:objective"),btn("「早上吃了什麼？距離上次正常進食多久？」","217:meal")];}
- else if(focus==="objective"){a=[btn(v.meal?"執行床邊 OneTouch 血糖測量":"「早上吃了什麼？距離上次正常進食多久？」",v.meal?"217:bg":"217:meal")];}
- else if(focus==="meal"){a=[btn(v.objective?"執行床邊 OneTouch 血糖測量":"執行意識、瞳孔與吞嚥安全評估",v.objective?"217:bg":"217:objective")];}
+ else if(focus==="objective"){a=v.symptom?[btn(v.meal?"執行床邊 OneTouch 血糖測量":"「早上吃了什麼？距離上次正常進食多久？」",v.meal?"217:bg":"217:meal")]:[btn("「阿姨，不舒服的感覺可以再描述清楚一點嗎？」","217:clarify")];}
+ else if(focus==="meal"){a=[btn(!v.symptom?"釐清現在不舒服的症狀":v.objective?"執行床邊 OneTouch 血糖測量":"執行意識、瞳孔與吞嚥安全評估",!v.symptom?"217:clarify":v.objective?"217:bg":"217:objective")];}
  else if(focus==="bg"){a=[btn("針對血糖 68 mg/dL 採取當下處置","217:glucoseMenu"),btn("電話通報陳醫師","doc:glucose")];}
  else if(focus==="glucoseUnsafe"){a=[btn("重新評估並處理症狀性低血糖","217:glucoseMenu")];}
  else if(focus==="food"){a=[btn("電話通報陳醫師｜217 床血糖","doc:glucose")];}
@@ -202,7 +202,7 @@ function renderMed(){
  ["無菌準備","完成手部衛生、工作區清潔與穿刺部位消毒"],
  ["抽藥污染情境","抽藥時碰觸到須保持無菌的關鍵部位，應如何處理？"]
  ];
- if(a.finished)return box("治療室","你已完成本次模擬無菌準備與污染應變。")+choices(btn("回護理站","go:desk"));
+ if(a.finished)return box("治療室","你已完成本次教學無菌準備與污染應變。")+choices(btn("回護理站","go:desk"));
  if(a.decision!=="safe")return box("待處理","尚未完成新抗生素醫囑、藥敏、過敏與腎功能評估，不應直接開始配藥。")+choices(btn("去護理站查核","go:desk"));
  const p=prompts[a.step];
  return box(p[0],p[1])+choices(btn(a.step===2?"停止使用污染器材，更換後依規範重新準備":"按程序完成這一步","aseptic:safe"),
@@ -215,7 +215,7 @@ function scoreSummary(){
  return '<p class="kicker">DEBRIEF · 已評 '+assessed+"/"+ITEMS.length+" 項</p>"+
  '<div class="resultbig">'+points+'<small style="font-size:19px"> / '+(ITEMS.length*2)+"</small></div>"+
  '<div class="results">'+rows+"</div>"+
- noteBox("同一評分項目只計首次決策；病人提示、再次評估、修正與補救則完整保留操作歷程。沒有接觸的項目顯示「未評估」，不等同於做錯。這是教學模擬，不是 EPA 信賴等級。");
+ noteBox("同一評分項目只計首次決策；病人提示、再次評估、修正與補救則完整保留操作歷程。沒有接觸的項目顯示「未評估」，不等同於做錯。這是教學教學，不是 EPA 信賴等級。");
 }
 function renderEnd(){
  header("任務回顧｜臨床決策紀錄","可隨時查看進度；返回病房後續做，不用重新開始");
@@ -368,13 +368,20 @@ function drawModal(){
   const kind=modal.slice(6),r=doctorReport(kind);
   title=r.doctor+"｜電話回覆";html=box(r.doctor,r.reply);
   html+=pbtn("結束通話，返回病房","close");
+ }else if(modal==="leaflet"){
+  title="藥品仿單｜作用重點";
+  html='<div class="record-head">目前三種口服藥物的主要作用</div><table class="record">'+
+    '<tr><th>Aspirin</th><td>抗血小板，降低血栓形成風險</td></tr>'+
+    '<tr><th>Famotidine</th><td>抑制胃酸分泌</td></tr>'+
+    '<tr><th>Metformin</th><td>協助控制血糖</td></tr></table>'+
+    '<p class="panel-info">這裡為作用重點；正式藥品仿單依實際廠牌與許可證查詢。</p>'+
+    '<p><a href="https://mcp.fda.gov.tw/" target="_blank" rel="noopener noreferrer">開啟食藥署正式藥品仿單查詢平台 ↗</a></p>'+
+    pbtn("逐一確認三種藥物的作用","quiz:start");
  }else if(modal==="glucose"){
   title="217 床｜血糖 68 mg/dL";
   html='<div class="panel-answer"><b>當下資料：</b> '+(g.objective?"GCS E4V5M6，Pupil size 2.0 mm (+) OU，已評估吞嚥安全。":"尚未完成意識與吞嚥安全評估。")+' 手抖、心悸。</div>'+
-  pbtn("評估意識及吞嚥安全，先請病人進食早餐，立即向醫師通報並追蹤","glucose:meal")+
-  pbtn("依院內低血糖標準採取適當口服醣類處置、通報及複測","glucose:protocol")+
-  pbtn("不評估就讓家屬餵食，不需通報與複測","glucose:unsafe")+
-  pbtn("照常給 Metformin，下次測量再說","glucose:unsafeMed");
+  pbtn("確認病人可安全吞嚥，先請病人進食早餐，同步通報陳醫師並安排複測","glucose:meal")+
+  pbtn("不先處理症狀，照常給 Metformin，等下次常規血糖","glucose:unsafeMed");
  }else if(modal==="med217"){
   title="217 床｜給藥條件";html=pbtn("Metformin：核對病況、進食、腎功能及醫囑","217:metformin")+
    pbtn("Famotidine：核對適應症並回應用藥疑慮","217:famotidine")+
@@ -404,12 +411,12 @@ function do217(k){
  if(k==="glucoseMenu"){openModal("glucose");return}
  if(k==="recheck"){
   if(s.minute<v.bgMinute+15){v.line="血糖處置後仍需等到安排的複測時點；期間請持續觀察症狀。";note("血糖追蹤","複測時點尚未到");}
-  else {v.recheck=true;v.recheckValue=96;v.line="這次複測血糖 96 mg/dL；病人表示手抖與心悸已較先前減輕。";note("217複測","96 mg/dL，症狀減輕（模擬數值）");}
+  else {v.recheck=true;v.recheckValue=96;v.line="這次複測血糖 96 mg/dL；病人表示手抖與心悸已較先前減輕。";note("217複測","96 mg/dL，症狀減輕（個案數值）");}
  }
  if(k==="stool"){v.stool=true;v.line="昨天晚上大便顏色看起來比平常深，我也不確定是怎麼回事。";note("217排便主訴","昨晚便色偏深")}
  if(k==="stoolDetail"){v.stoolDetail=true;v.line="昨晚只有一次，比平常黑、比較黏，量我沒注意。";note("217排便追問","偏黑較黏，一次，量未注意")}
  if(k==="bruise"){v.bruise=true;v.line="手臂有幾塊瘀青，我不確定什麼時候有的。";note("217出血評估","手臂瘀青；尚未證實消化道出血")}
- if(k==="vital"){v.vital=true;v.line="生命徵象：BP 126/78 mmHg，HR 82/min（教學模擬）；無法排除仍有出血風險。";note("217生命徵象","BP126/78，HR82")}
+ if(k==="vital"){v.vital=true;v.line="生命徵象：BP 126/78 mmHg，HR 82/min；無法排除仍有出血風險。";note("217生命徵象","BP126/78，HR82")}
  if(k==="aspReview"){v.aspReview=true;v.line="你已查閱 Aspirin 醫囑與使用紀錄；尚須依當下病況決定是否適合給藥。";note("217醫囑","核對 Aspirin");closeModal()}
  if(k==="aspirinMenu"){openModal("aspirinMenu");return}
  if(k==="metformin"){v.metforminChecked=true;point("med217",v.bg&&v.food?2:1,"核對 Metformin、病況與低血糖後給藥條件");v.line="已核對 Metformin 的給藥條件；不可把低血糖直接歸因於 Metformin 單用。";closeModal()}
@@ -441,7 +448,7 @@ function do220(k){
   v.positioned=true;v.line="已示範枕頭支托患側上肢，提醒移位時避免拉扯患側手臂。";
   point("shoulderCare",v.prompted?1:2,"完成患側擺位及衛教");note("220衛教","支托患側上肢、避免牽拉");
  }
- if(k==="acet"){v.acetViewed=true;v.line="已查閱醫囑：Acetaminophen 1 tab PO BID；仍須核對實際劑量與最近給藥。";note("220 MAR","核對 Acetaminophen 1 tab PO BID");closeModal()}
+ if(k==="acet"){v.acetViewed=true;v.line="已查閱醫囑：Acetaminophen 1 tab PO BID、Norvasc 1 tab PO QD。";note("220 給藥紀錄","核對 Acetaminophen 與 Norvasc");closeModal()}
  if(k==="follow"){v.follow=true;v.line="已重新確認左肩疼痛、患側支托與復健活動後的症狀。";point("return",v.positioned?2:1,"完成220床疼痛再評估");note("220追蹤","重新評估肩痛與擺位")}
  render();
 }
@@ -486,6 +493,7 @@ function act(token){
   closeModal();render();return;
  }
  if(a==="quiz"){
+  if(b==="openLeaflet"){openModal("leaflet");return;}
   const v=s.b217,q=v.medQuiz;
   if(b==="start"){
    q.index=0;q.firstCorrect=0;q.answer="";q.done=false;
