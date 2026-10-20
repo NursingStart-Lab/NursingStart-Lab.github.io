@@ -303,41 +303,60 @@ function drawModal(){
  let html="",title="";
  const p=s.place,g=s.b217,i=s.b219,w=s.b220,a=s.abx;
  if(modal==="cart"){
-  title="手推護理工作車｜MAR";
+  title="護理工作車";
   if(p==="bed219"){
-   html='<div class="record-head">219 床｜一般重力滴注輸液（教學模擬）</div><table class="record">'+
-    '<tr><th>種類</th><td>0.9% N/S 500 mL</td></tr><tr><th>醫囑</th><td>60 mL/hr，請核對滴係數與實際滴速</td></tr><tr><th>輸液狀態</th><td>'+(i.lineRemoved?"原有疑慮的留置針已停止使用":"須到床旁核對管路及滴速")+"</td></tr></table>"+
-    (i.lineRemoved?'<div class="panel-answer">原留置針已停止使用，需先確認新的輸液通路，無法核對不存在的實際滴速。</div>':pbtn("完成有效醫囑與實際滴速核對","219:rate"));
+    html='<div class="record-head">219 床｜輸液醫囑</div><table class="record">'+
+    '<tr><th>點滴</th><td>0.9% N/S 500 mL IVD BID</td></tr>'+
+    '<tr><th>流速</th><td>60 mL/hr</td></tr></table>'+
+    (i.lineRemoved?'<div class="panel-answer">原留置針已停止使用，待確認後續輸液通路。</div>':
+    pbtn("完成本次醫囑與滴速核對","219:rate"));
   }else if(p==="bed220"){
-   html='<div class="record-head">220 床｜給藥紀錄</div><table class="record"><tr><th>Acetaminophen</th><td>1 tab PO BID（劑量與最近給藥時間另須核對）</td></tr></table>'+
-    pbtn("完成醫囑核對","220:acet");
+    html='<div class="record-head">220 床｜給藥醫囑</div><table class="record">'+
+    '<tr><th>Acetaminophen</th><td>1 tab PO BID</td></tr>'+
+    '<tr><th>Norvasc</th><td>1 tab PO QD</td></tr></table>'+
+    pbtn("確認這兩筆醫囑","220:acet");
   }else{
-   html='<div class="record-head">217 床｜用藥清單</div><table class="record"><tr><th>Aspirin</th><td>給藥前確認疑似出血風險</td></tr><tr><th>Metformin</th><td>評估進食、血糖、腎功能及醫囑</td></tr><tr><th>Famotidine</th><td>確認適應症及病人疑慮</td></tr></table>'+
-   pbtn("檢查 Aspirin 醫囑與給藥紀錄","217:aspReview")+
-   pbtn("核對 Metformin 給藥條件","217:metformin")+
-   pbtn("核對 Famotidine 適應症與給藥條件","217:famotidine");
+    html='<div class="record-head">217 床｜給藥醫囑</div><table class="record">'+
+    '<tr><th>Aspirin</th><td>1 cap PO QD</td></tr>'+
+    '<tr><th>Famotidine</th><td>1 tab PO BID</td></tr>'+
+    '<tr><th>Metformin</th><td>1 tab PO BID</td></tr></table>'+
+    pbtn("開啟三種藥物的仿單作用說明","quiz:openLeaflet");
   }
+ 
  }else if(modal==="ehr217"){
-  title="217 床｜電子病歷";html='<div class="record-head">模擬既往血糖紀錄</div><table class="record">'+
-  '<tr><th>昨日 06:30</th><td>108 mg/dL</td></tr><tr><th>昨日 21:00</th><td>126 mg/dL</td></tr>'+
-  (g.bg?'<tr><th>今日床邊測量</th><td>68 mg/dL</td></tr>':"")+
-  (g.recheck?'<tr><th>處置後複測</th><td>'+g.recheckValue+" mg/dL</td></tr>":"")+'</table>'+
-  '<div class="record-head">醫囑摘要</div><table class="record"><tr><th>輸液</th><td>0.9% N/S 500 mL IVD BID</td></tr><tr><th>口服藥</th><td>Aspirin / Metformin / Famotidine</td></tr></table>';
+ title="217 床｜電子病歷";
+ html='<div class="record-head">血糖紀錄</div><table class="record">'+
+ '<tr><th>昨日 06:30</th><td>108 mg/dL</td></tr><tr><th>昨日 21:00</th><td>126 mg/dL</td></tr>'+
+ (g.bg?'<tr><th>今日床邊血糖</th><td>68 mg/dL</td></tr>':"")+
+ (g.recheck?'<tr><th>處置後複測</th><td>'+g.recheckValue+" mg/dL</td></tr>":"")+'</table>'+
+ '<div class="record-head">醫囑</div><table class="record">'+
+ '<tr><th>0.9% N/S</th><td>500 mL IVD BID</td></tr>'+
+ '<tr><th>Aspirin</th><td>1 cap PO QD</td></tr>'+
+ '<tr><th>Famotidine</th><td>1 tab PO BID</td></tr>'+
+ '<tr><th>Metformin</th><td>1 tab PO BID</td></tr></table>';
+ 
  }else if(modal==="ehr219"){
-  title="219 床｜一般輸液醫囑";html='<p>0.9% N/S 500 mL（教學模擬）；目前醫囑流速 60 mL/hr。留置針部位與實際滴速仍須床旁評估。</p>';
+ title="219 床｜輸液醫囑";
+ html='<table class="record"><tr><th>0.9% N/S</th><td>500 mL IVD BID</td></tr>'+
+ '<tr><th>流速</th><td>60 mL/hr</td></tr></table>';
+ 
  }else if(modal==="ehr220"){
-  title="220 床｜復健及用藥紀錄";html='<table class="record"><tr><th>診斷背景</th><td>腦中風後左側偏癱，住院接受復健</td></tr><tr><th>用藥</th><td>Acetaminophen 1 tab PO BID</td></tr></table>';
+ title="220 床｜醫囑紀錄";
+ html='<div class="record-head">腦中風後左側偏癱，住院接受復健治療</div>'+
+ '<table class="record"><tr><th>Acetaminophen</th><td>1 tab PO BID</td></tr>'+
+ '<tr><th>Norvasc</th><td>1 tab PO QD</td></tr></table>';
+ 
  }else if(modal==="abx"){
-  title="217 床｜抗生素醫囑變更";a.order=true;
-  html=box("新醫囑","Clindamycin 停用，新增 Cefepime。須核對臨床狀況、培養、過敏、腎功能與配製要求。")+
-  pbtn("查閱血液培養及藥敏","abx:culture")+
-  pbtn("查看藥物過敏史","abx:allergy")+
-  pbtn("查看腎功能是否已有資料","abx:renal")+
-  pbtn("完成醫囑查核並決定下一步","abx:decide");
-  if(a.culture)html+='<div class="panel-answer">Blood culture（模擬）：GNB，Acinetobacter spp.，Cefepime S。須結合臨床情境與醫囑解讀。</div>';
-  if(a.allergy)html+='<div class="panel-answer">曾記錄 Vancomycin HCl：skin rash；仍需核對新藥之過敏風險。</div>';
-  if(a.renal)html+='<div class="panel-answer">未提供可用的近期腎功能數值，需依實際醫囑進一步查核，不能自行假設正常。</div>';
-  if(a.decision)html+='<div class="panel-answer">目前判斷：'+(a.decision==="safe"?"完成可取得資訊之查證；實際給藥前仍須確認處方及缺漏資料。":"資訊不足或不安全的給藥決策")+"</div>";
+ title="217 床｜抗生素醫囑與檢驗";a.order=true;
+ html='<div class="record-head">Clindamycin 停用；Cefepime 新增</div>'+
+ pbtn("查看血液培養報告","abx:culture")+
+ pbtn("查看藥物過敏史","abx:allergy")+
+ pbtn("查看腎功能","abx:renal")+
+ pbtn("核對醫囑，決定備藥","abx:decide");
+ if(a.culture)html+='<div class="panel-answer"><b>Blood culture</b>：GNB／Acinetobacter spp.／Cefepime S</div>';
+ if(a.allergy)html+='<div class="panel-answer"><b>藥物過敏史</b>：Vancomycin HCl／Skin rash</div>';
+ if(a.renal)html+='<div class="panel-answer"><b>Cr</b>：0.8 mg/dL　<b>eGFR</b>：96 mL/min/1.73 m²</div>';
+ 
  }else if(modal.startsWith("doc:")){
   const kind=modal.slice(4),r=doctorReport(kind);if(!r)return;
   title=r.title;
