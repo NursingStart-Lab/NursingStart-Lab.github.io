@@ -78,6 +78,8 @@ function render217(){
  header("217 床｜臨床評估與給藥","腦中風住院｜進度會依實際詢問、測量及處置保存");
  let h=box("217 床病人",v.line||"護理師，我覺得不太舒服，昨天沒有這樣。");
  if(s.bell&&!s.bellHandled){h+=box("🔔 219 床按鈴","219 床正在呼叫護理師。你要如何安排 217 床的後續追蹤？");h+=choices(btn("先確認 217 床複測與追蹤已安排，再去 219 床","217:handoff"),btn("直接前往 219 床","go:bed219"));}
+ if(v.bg)h+=noteBox("已取得：床邊血糖 68 mg/dL；"+(v.food?"已安排進食及通報，":"尚待安全處置，")+(v.recheck?"已完成複測。":"需追蹤複測。"));
+ if(v.stoolDetail)h+=noteBox("先前訪談：昨晚排便一次、便色偏黑而黏，仍須結合其他評估判斷。");
  const q=[];
  if(!v.symptom)q.push(btn("「可以再描述清楚一點嗎？哪裡不舒服、什麼感覺，之前有發生過嗎？」","217:clarify"));
  if(v.symptom&&!v.onset)q.push(btn("「手抖、心悸是什麼時候開始？還有沒有其他不舒服？」","217:onset"));
@@ -119,8 +121,10 @@ function render219(){
  }
  if(v.painPrompted&&!v.decision&&!v.site)q.push(btn("點滴還能滴，晚點再處理","219:ignore"));
  if(v.ratePrompted&&!v.rate)h+=box("病人問","護理師，現在點滴滴得好像比昨天快，這樣正常嗎？");
- if(!v.rate)q.push(btn("打開工作車，核對 219 床輸液醫囑與實際滴速","modal:cart"));
- if(v.decision==="replace"&&!v.aftercare)q.push(btn("安排適當穿刺處照護及必要時重新建立輸液通路","219:aftercare"));
+ if(!v.rate&&!v.lineRemoved)q.push(btn("打開工作車，核對 219 床輸液醫囑與實際滴速","modal:cart"));
+ if(v.lineRemoved)h+=noteBox("原有疑慮的留置針已停止使用；目前不可當成仍有正常輸液滴速。");
+ if(v.decision==="ignore"&&!v.injury)q.push(btn("重新評估後決定立即停止輸液及移除有疑慮的留置針","219:injuryFollow"));
+ if(v.lineRemoved&&!v.aftercare)q.push(btn("完成穿刺處照護，依有效醫囑安排並確認新輸液通路","219:aftercare"));
  if(v.injuryFollow)h+=noteBox("已補救疑似靜脈炎，首次選擇仍保留 0 分；後續仍需追蹤局部狀況。");
  if(v.decision==="replace"&&v.aftercare)h+=noteBox("原異常通路已停止並移除，後續輸液依照安排進行。");
  q.push(btn("先去其他床位（可稍後返回）","go:bed217"));
@@ -267,7 +271,7 @@ function drawModal(){
   if(p==="bed219"){
    html='<div class="record-head">219 床｜一般重力滴注輸液（教學模擬）</div><table class="record">'+
     '<tr><th>種類</th><td>0.9% N/S 500 mL</td></tr><tr><th>醫囑</th><td>60 mL/hr，請核對滴係數與實際滴速</td></tr><tr><th>輸液狀態</th><td>'+(i.lineRemoved?"原有疑慮的留置針已停止使用":"須到床旁核對管路及滴速")+"</td></tr></table>"+
-    pbtn("完成有效醫囑與實際滴速核對","219:rate");
+    (i.lineRemoved?'<div class="panel-answer">原留置針已停止使用，需先確認新的輸液通路，無法核對不存在的實際滴速。</div>':pbtn("完成有效醫囑與實際滴速核對","219:rate"));
   }else if(p==="bed220"){
    html='<div class="record-head">220 床｜給藥紀錄</div><table class="record"><tr><th>Acetaminophen</th><td>1 tab PO BID（劑量與最近給藥時間另須核對）</td></tr></table>'+
     pbtn("完成醫囑核對","220:acet");
@@ -363,8 +367,9 @@ function do219(k){
  if(k==="replace"){v.decision="replace";v.lineRemoved=true;v.line="已停止使用原有疑慮的周邊靜脈留置針並依規範移除，需安排後續輸液通路。";note("219處置","移除有疑慮的通路");point("ivDecision",2,"主動安全處置")}
  if(k==="ignore"||k==="ignoreAgain"){v.decision="ignore";v.injuryMinute=s.minute;v.line="點滴還能滴，暫時不處理。";note("219不安全處置","忽略留置針異常");point("ivDecision",0,"首次選擇忽略異常")}
  if(k==="injuryFollow"){v.injuryFollow=true;v.decision="rescued";v.lineRemoved=true;v.line="已停止輸液、移除有疑慮的留置針並評估疑似靜脈炎，後續追蹤局部狀況。";note("219補救","移除異常通路；首次不安全選擇保留 0 分");point("ivDecision",0,"補救但不回補首次分數")}
+ if(k==="rate"&&v.lineRemoved){note("219安全提醒","尚未重新建立通路，不應核對實際流速");closeModal();render();return;}
  if(k==="rate"){v.rate=true;v.line="已核對 219 床有效輸液醫囑與實際滴速。";note("219輸液","比對醫囑與實際滴速，非輸液幫浦");point("ivRate",v.ratePrompted?1:2,"已確認輸液滴速");closeModal()}
- if(k==="aftercare"){v.aftercare=true;v.line="完成穿刺處照護與後續通路安排，並觀察局部狀況。";point("return",2,"有安排後續輸液與再評估");note("219追蹤","記錄後續輸液通路及皮膚照護")}
+ if(k==="aftercare"){v.aftercare=true;v.lineRemoved=false;v.line="已完成穿刺處照護，依有效醫囑確認新建立的周邊靜脈輸液通路；續評估局部狀況。";point("return",2,"有安排後續輸液與再評估");note("219追蹤","記錄後續輸液通路及皮膚照護")}
  render();
 }
 function do220(k){
