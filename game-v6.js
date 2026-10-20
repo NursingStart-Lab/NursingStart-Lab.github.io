@@ -63,6 +63,7 @@ function noteBox(value){return '<div class="note">'+value+"</div>"}
 function choices(...a){return '<div class="choices">'+a.join("")+"</div>"}
 function move(place){
  if(!["bed217","bed219","bed220","desk","med"].includes(place))return;
+ const previous=s.place;
  closeModal();if(s.place!=="start"&&s.place!==place)note("離開床位","前往 "+place+"；保留原床資料");
  if(!s.firstPlace)s.firstPlace=place;
  if(place==="bed219"&&s.bell&&!s.bellHandled){
@@ -86,11 +87,29 @@ function move(place){
  }
  if(s.place==="bed217"&&s.b217.bg&&!s.b217.food&&!s.b217.gPriorUnsafe)note("待追蹤","217 床低血糖尚未完成處置");
  s.place=place;tick(2);render();
+ walkFrom(previous,place);
+}
+const WALK_POS={start:[50,53],bed217:[26,52],bed219:[74,52],bed220:[74,64],desk:[26,64],med:[26,64]};
+function walkFrom(previous,next){
+ if(previous===next)return;
+ const from=WALK_POS[previous]||WALK_POS.start,to=WALK_POS[next]||WALK_POS.start;
+ for(const [id,dx,dy] of [["nurse",0,0],["cart",7,2]]){
+  const node=$(id);
+  if(!node||typeof node.animate!=="function")continue;
+  if(typeof node.getAnimations==="function")node.getAnimations().forEach(a=>a.cancel());
+  const step=(x,y,offset)=>({left:(x+dx)+"%",top:(y+dy)+"%",offset});
+  node.animate([
+   step(from[0],from[1],0),
+   step(from[0],53,.24),
+   step(to[0],53,.78),
+   step(to[0],to[1],1)
+  ],{duration:1100,easing:"ease-in-out"});
+ }
 }
 function coords(){
- const p={start:[49,66],bed217:[18,26],bed219:[51,26],bed220:[84,26],desk:[26,80],med:[76,80]}[s.place]||[49,66];
+ const p=WALK_POS[s.place]||WALK_POS.start;
  $("nurse").style.left=p[0]+"%";$("nurse").style.top=p[1]+"%";
- $("cart").style.left=(p[0]+5)+"%";$("cart").style.top=(p[1]+2)+"%";
+ $("cart").style.left=(p[0]+7)+"%";$("cart").style.top=(p[1]+2)+"%";
 }
 function header(title,sub){$("ctitle").textContent=title;$("csub").textContent=sub}
 function status(){
@@ -109,7 +128,7 @@ function renderStart(){
  choices(btn("前往 217 床｜了解病況","go:bed217"),btn("前往 219 床｜檢查輸液","go:bed219"),btn("前往 220 床｜復健照護","go:bed220"),btn("先到護理站看紀錄","go:desk"));
 }
 function render217(){
- const v=s.b217;
+ const v=s.b217;v.visited=true;
  header("217 床｜臨床評估與給藥","");
  let focus=v.focus||"start",line=v.line||"護理師，我覺得不太舒服，昨天沒有這樣。",a=[];
  const pair=(correct,good,wrong,bad,wrongFirst=false)=>wrongFirst?[btn(bad,wrong),btn(good,correct)]:[btn(good,correct),btn(bad,wrong)];
@@ -251,13 +270,14 @@ function render220(){
  return content+(a.length?choices(...a):"");
 }
 function renderDesk(){
- header("護理站｜查閱資料與工作待辦","資料需要由學員主動打開，不會把病人的隱藏線索直接放在主畫面");
+ header("護理站｜查閱資料與工作待辦","");
  let h=box("護理站","選擇想查閱的紀錄；新抗生素醫囑會隨工作時間開啟。")+status();
  h+=choices(btn("217 床｜電子病歷、血糖紀錄、醫囑","modal:ehr217"),
  btn("219 床｜一般輸液醫囑","modal:ehr219"),
  btn("220 床｜復健與用藥紀錄","modal:ehr220"),
  btn("新醫囑｜Clindamycin → Cefepime","modal:abx"),
- btn("整理工作／觀看目前學習紀錄","end:review"));
+ btn("無菌備藥流程","go:med"),
+ btn("查看巡房進度","end:review"));
  return h;
 }
 function renderMed(){
@@ -281,11 +301,12 @@ function scoreSummary(){
  return '<p class="kicker">DEBRIEF · 已評 '+assessed+"/"+ITEMS.length+" 項</p>"+
  '<div class="resultbig">'+points+'<small style="font-size:19px"> / '+(ITEMS.length*2)+"</small></div>"+
  '<div class="results">'+rows+"</div>"+
- noteBox("同一評分項目只計首次決策；病人提示、再次評估、修正與補救則完整保留操作歷程。沒有接觸的項目顯示「未評估」，不等同於做錯。這是教學教學，不是 EPA 信賴等級。");
+ noteBox("同一評分項目只計首次決策；病人提示、再次評估、修正與補救則完整保留操作歷程。沒有接觸的項目顯示「未評估」，不等同於做錯。此為教學，不是 EPA 信賴等級。");
 }
 function renderEnd(){
- header("任務回顧｜臨床決策紀錄","可隨時查看進度；返回病房後續做，不用重新開始");
- let h=scoreSummary()+choices(btn("回到病房繼續值班","end:continue"),btn("複製學習紀錄","end:copy"),btn("從頭重新試玩","end:reset"));
+ header("巡房回顧｜臨床決策紀錄","");
+ const unseen=[["bed217","217 床",!!s.b217.visited],["bed219","219 床",!!s.b219.visited],["bed220","220 床",!!s.b220.visited]].filter(x=>!x[2]);
+ let h=(unseen.length?noteBox("<b>還有病床尚未探視：</b>"+unseen.map(x=>x[1]).join("、")+"。請先完成巡房，才能視為全部結束。")+choices(...unseen.map(x=>btn("前往 "+x[1], "go:"+x[0]))):"")+scoreSummary()+choices(btn("回到病房繼續值班","end:continue"),btn("複製學習紀錄","end:copy"),btn("從頭重新試玩","end:reset"));
  const l=s.log.slice(-16).map(o=>'<div class="result-row"><span>'+o.time+"　"+o.label+"</span><span>"+o.value+"</span></div>").join("");
  return h+'<div class="note"><b>最近操作紀錄</b>'+l+"</div>";
 }
