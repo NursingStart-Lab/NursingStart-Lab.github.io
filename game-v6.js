@@ -30,6 +30,10 @@ function restore(){
   if(d&&d.version===6&&d.b217&&d.b219&&d.b220&&d.abx&&Array.isArray(d.log)){
    const g=d.b217,i=d.b219,w=d.b220;
    if(!g.medQuiz)g.medQuiz={index:0,firstCorrect:0,answer:"",done:false};
+   if(!Number.isFinite(g.gMistakes))g.gMistakes=0;
+   if(!Number.isFinite(g.aMistakes))g.aMistakes=0;
+   if(!g.returnFocus)g.returnFocus="start";
+   if(typeof g.lastFeedback!=="string")g.lastFeedback="";
    if(!g.focus){
     g.focus=g.aspirinPlan?"aspirinPlan":
      g.aspirReport?"aspirReported":g.aspReview?"aspReview":g.vital?"vital":
@@ -463,12 +467,40 @@ function drawModal(){
 }
 function do217(k){
  const v=s.b217;tick();
+ const wrong={
+  wrongClarify:"病人已主訴手抖與心悸，還需要詢問發生時間及其他症狀，不能只請病人休息。",
+  wrongOnset:"不能僅憑病人能對答，就把手抖與心悸認定為緊張；應完成必要客觀評估。",
+  wrongObjective:"尚未確認進食與當下病況，不應直接執行常規口服給藥。",
+  wrongMeal:"進食不足可能與症狀有關，但不能只靠推測，仍須測得當下血糖。",
+  wrongFood:"不能因為已經請病人進食，就忽略必要通報及後續血糖追蹤。",
+  wrongPostReport:"血糖通報不代表所有照護已完成，仍須釐清病人其他症狀和給藥風險。",
+  wrongRecheck:"血糖 68 mg/dL 已有症狀，完成處置後需要複測並追蹤，不應直接跳過。",
+  wrongStoolDetail:"一次偏黑、較黏的排便仍需進一步評估可能的出血徵象。",
+  wrongBruise:"出現便色變深、瘀青，需要測量生命徵象並評估是否有其他異常。",
+  wrongVital:"應核對 Aspirin 醫囑、完成評估及通報，不能自行決定永久停藥。",
+  wrongAspReview:"有 Aspirin 醫囑並不代表可以忽略新出現的疑似出血徵象。",
+  wrongAspirReported:"沒有醫師確認，不應自行決定永久停用 Aspirin。",
+  wrongFamotidine:"回答病人疑問前應先查證藥物用途，不能只用「醫師有開」代替衛教。"
+ };
+ if(wrong[k]){
+  const previous=v.focus||"start";
+  if(["stool","stoolDetail","bruise","vital","aspReview","aspirReported","aspirinPlan"].includes(previous))v.aMistakes++;
+  else v.gMistakes++;
+  v.returnFocus=previous;v.lastFeedback=wrong[k];v.focus="feedback";
+  note("217 床首次判斷","未完成適當評估："+wrong[k]);
+  render();return;
+ }
+ if(k==="resume"){
+  v.focus=v.returnFocus||"start";
+  note("217 床補充評估","經提示後返回："+v.focus);
+  render();return;
+ }
  if(["clarify","onset","objective","meal","bg","stool","stoolDetail","bruise","vital","aspReview","recheck"].includes(k))v.focus=k;
  if(k==="clarify"){v.symptom=true;v.line="我手有點抖，心臟跳得有點快，昨天沒有這樣。";note("217主訴","主動釐清手抖與心悸")}
  if(k==="onset"){v.onset=true;v.line="剛才開始，現在還有一點抖，也覺得虛虛的。";note("217症狀","詢問發作時間與伴隨症狀")}
  if(k==="objective"){v.objective=true;v.swallow=true;v.line="客觀評估：GCS E4V5M6，Pupil size 2.0 mm (+) OU；意識清楚、可正常對答，完成吞嚥安全評估。";note("217客觀評估","意識、瞳孔及安全吞嚥")}
  if(k==="meal"){v.meal=true;v.line="昨晚睡前到現在大概九個小時都沒正常吃東西，早上只喝幾口豆漿。";note("217進食詢問","約九小時未正常進食")}
- if(k==="bg"){v.bg=true;v.bgMinute=s.minute;v.line="床邊 OneTouch 血糖數值：68 mg/dL。";note("217血糖","實際測得 68 mg/dL")}
+ if(k==="bg"){v.bg=true;v.bgMinute=s.minute;v.line="床邊 OneTouch 血糖數值：68 mg/dL。";note("217血糖","實際測得 68 mg/dL");point("gAssess",!v.symptom||!v.objective||!v.meal?0:v.gMistakes===0?2:v.gMistakes===1?1:0,"症狀、客觀評估、進食及血糖量測的首次判斷");}
  if(k==="handoff"){s.handoff=true;note("217追蹤交接","確認血糖複測與症狀追蹤、安排必要協助");render();return}
  if(k==="glucoseMenu"){openModal("glucose");return}
  if(k==="recheck"){
@@ -525,7 +557,7 @@ function report(kind){
   note("初次通報資訊不完整","醫師追問後需要補齊資料；若最終沒有完成將保持未完成");
  }else{
   if(kind==="glucose"){v.glucoseReported=true;v.focus="glucoseReported";s.bell=true;point("gReport",v.glucosePrompted?1:2,"完成簡短血糖電話通報");note("219床呼叫鈴","217 床已安排通報，另床發出呼叫");}
-  if(kind==="aspirin"){v.aspirReport=true;v.focus="aspirReported";point("aAssess",v.stoolDetail&&v.bruise&&v.vital?2:1,"完成出血風險資料蒐集");point("aReport",v.aspirPrompted?1:2,"完成 Aspirin 疑似出血通報");}
+  if(kind==="aspirin"){v.aspirReport=true;v.focus="aspirReported";point("aAssess",!v.stoolDetail||!v.bruise||!v.vital?0:v.aMistakes===0?2:v.aMistakes===1?1:0,"排便、瘀青、生命徵象及醫囑查核");point("aReport",v.aspirPrompted?1:2,"完成 Aspirin 疑似出血通報");}
   if(kind==="shoulder"){v.report=true;v.focus="reported";point("shoulderAssess",v.onset&&v.score&&v.triggers&&v.arm&&v.exam?2:1,"完成疼痛及患側評估");point("shoulderReport",v.prompted?1:2,"向林醫師報告左肩疼痛與藥膏需求");}
   note("醫師通報",r.doctor+"收到完整病況，未擅自代醫師開立新處置");
  }
