@@ -119,7 +119,7 @@ function render219(){
   h+=choices(btn("停止使用原通路，移除留置針，評估、照護及通報","219:injuryFollow"),btn("依舊覺得還可以滴，繼續使用","219:ignoreAgain"));return h;
  }
  let q=[];
- if(v.painPrompted&&!v.site)h+=box("病人補充","護理師，我的手有點痛，可以幫我看一下嗎？");
+ if(v.painPrompted&&!v.site&&!v.line.includes("我的手有點痛"))h+=box("病人補充","護理師，我的手有點痛，可以幫我看一下嗎？");
  if(!v.site)q.push(btn("觀察留置針周圍皮膚與敷料，評估局部溫度及壓痛","219:site"));
  if(!v.asked)q.push(btn("「點滴打的地方會刺痛、灼熱或不舒服嗎？」","219:ask"));
  if(v.site&&!v.decision){
@@ -128,7 +128,7 @@ function render219(){
   q.push(btn("沒有喊痛，點滴還在滴，暫時繼續使用","219:ignore"));
  }
  if(v.painPrompted&&!v.decision&&!v.site)q.push(btn("點滴還能滴，晚點再處理","219:ignore"));
- if(v.ratePrompted&&!v.rate)h+=box("病人問","護理師，現在點滴滴得好像比昨天快，這樣正常嗎？");
+ if(v.ratePrompted&&!v.rate&&!v.line.includes("比昨天快"))h+=box("病人問","護理師，現在點滴滴得好像比昨天快，這樣正常嗎？");
  if(!v.rate&&!v.lineRemoved)q.push(btn("打開工作車，核對 219 床輸液醫囑與實際滴速","modal:cart"));
  if(v.lineRemoved)h+=noteBox("原有疑慮的留置針已停止使用；目前不可當成仍有正常輸液滴速。");
  if(v.decision==="ignore"&&!v.injury)q.push(btn("重新評估後決定立即停止輸液及移除有疑慮的留置針","219:injuryFollow"));
