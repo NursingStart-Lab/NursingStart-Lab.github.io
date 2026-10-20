@@ -108,7 +108,7 @@ const NUM={brief:1,assessment:1,priority:2,glucose:3,call:4,iv:4,meds:5,culture:
 let s;
 function reset(){s={phase:'brief',flags:{talk:false,chart:false,report:false,mar:false},rank:['record','med','bleed','glucose'],scores:{},medChoices:{},activeMed:'aspirin',asepticStep:0,log:[],bad:0,pos:'start',feedback:'',cultureChoice:false,patientAnswers:[],patientNode:'start',patientSeen:[],bloodMeasured:false,glucoseHandled:false,prioritySubmitted:false,handoff:false,ivInitial:{visited:false,site:false,comfort:false,rateAsked:false,verified:false,prompted:false,complete:false},sterileWrong:[],glucoseWrong:false,ivWrong:false,followWrong:false};save()}
 function save(){try{localStorage.setItem('nursestart-lab-ward-pilot-v4',JSON.stringify(s))}catch(e){}}
-function restore(){try{const t=JSON.parse(localStorage.getItem('nursestart-lab-ward-pilot-v3'));if(t&&typeof t.phase==='string'&&Array.isArray(t.log)&&t.scores&&Array.isArray(t.rank)&&t.flags&&Array.isArray(t.patientAnswers)&&t.ivInitial){s=t;return true}}catch(e){}return false}
+function restore(){try{const t=JSON.parse(localStorage.getItem('nursestart-lab-ward-pilot-v4'));if(t&&typeof t.phase==='string'&&Array.isArray(t.log)&&t.scores&&Array.isArray(t.rank)&&t.flags&&Array.isArray(t.patientAnswers)&&t.ivInitial){s=t;return true}}catch(e){}return false}
 function log(label,value){s.log.push({time:TIME[s.phase]||'09:00',label,value});save()}
 function award(key,score,label,value){if(s.scores[key]===undefined)s.scores[key]=score;log(label,value)}
 function toast(t){$('toast').textContent=t;$('toast').classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').classList.add('hidden'),2600)}
