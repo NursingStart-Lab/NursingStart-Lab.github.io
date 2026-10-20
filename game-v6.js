@@ -47,12 +47,12 @@ function move(place){
  if(s.place==="bed219"&&place!=="bed219"){
   const v=s.b219;
   if(!v.site&&!v.painPrompted){
-   v.painPrompted=true;v.line="護理師，我的手有點痛，可以幫我看一下嗎？";
+   v.painPrompted=true;v.focus="painPrompted";v.line="護理師，我的手有點痛，可以幫我看一下嗎？";
    note("219病人提醒","第一次準備離開時，病人反映手痛");
    render();return;
   }
   if(v.site&&!v.rate&&!v.ratePrompted&&!v.lineRemoved&&v.decision){
-   v.ratePrompted=true;v.line="護理師，現在點滴滴得好像比昨天快，這樣正常嗎？";
+   v.ratePrompted=true;v.focus="ratePrompted";v.line="護理師，現在點滴滴得好像比昨天快，這樣正常嗎？";
    note("219病人提醒","下一次準備離開時，病人才提出滴速疑問");
    render();return;
   }
@@ -375,6 +375,7 @@ function drawModal(){
 }
 function do217(k){
  const v=s.b217;tick();
+ if(["clarify","onset","objective","meal","bg","stool","stoolDetail","bruise","vital","aspReview","recheck"].includes(k))v.focus=k;
  if(k==="clarify"){v.symptom=true;v.line="我手有點抖，心臟跳得有點快，昨天沒有這樣。";note("217主訴","主動釐清手抖與心悸")}
  if(k==="onset"){v.onset=true;v.line="剛才開始，現在還有一點抖，也覺得虛虛的。";note("217症狀","詢問發作時間與伴隨症狀")}
  if(k==="objective"){v.objective=true;v.swallow=true;v.line="客觀評估：GCS E4V5M6，Pupil size 2.0 mm (+) OU；意識清楚、可正常對答，完成吞嚥安全評估。";note("217客觀評估","意識、瞳孔及安全吞嚥")}
@@ -398,6 +399,7 @@ function do217(k){
 }
 function do219(k){
  const v=s.b219;tick();
+ if(["site","ask","replace","ignore","injuryFollow","rate","aftercare"].includes(k))v.focus=k==="ignore"?"ignored":k;
  if(k==="site"){v.site=true;v.red=true;v.line="觀察：入針處局部泛紅，敷料完整。病人尚未主訴明顯壓痛。";note("219穿刺評估",v.painPrompted?"病人提醒後觀察到泛紅":"自主發現局部泛紅");point("ivAssess",v.painPrompted?1:2,"已查看留置針周圍")}
  if(k==="ask"){v.asked=true;v.line="目前不會很痛，但那附近有點怪怪的。";note("219訪談","詢問輸液部位不適")}
  if(k==="replace"){v.decision="replace";v.lineRemoved=true;v.line="已停止使用原有疑慮的周邊靜脈留置針並依規範移除，需安排後續輸液通路。";note("219處置","移除有疑慮的通路");point("ivDecision",2,"主動安全處置")}
@@ -410,6 +412,7 @@ function do219(k){
 }
 function do220(k){
  const v=s.b220;tick();
+ if(["onset","score","triggers","arm","exam","position","acet","follow"].includes(k))v.focus=k;
  if(k==="onset"){v.onset=true;v.line="中風以後開始會痛，以前沒有這麼明顯。";note("220疼痛起始","腦中風後開始")}
  if(k==="score"){v.score=true;v.line="左肩痠痠的，大概兩分，並不是突然很尖銳的疼痛。";note("220疼痛強度","左肩 2/10")}
  if(k==="triggers"){v.triggers=true;v.line="復健治療後或移位比較痛，有枕頭靠著托住手會好一點。";note("220疼痛因素","復健後加重，支托緩解")}
@@ -433,9 +436,9 @@ function report(kind){
   note("醫師追問",r.doctor+"詢問缺漏："+r.missing.join("、"));
   note("初次通報資訊不完整","醫師追問後需要補齊資料；若最終沒有完成將保持未完成");
  }else{
-  if(kind==="glucose"){v.glucoseReported=true;s.bell=true;point("gReport",v.glucosePrompted?1:2,"完成簡短血糖電話通報");note("219床呼叫鈴","217 床已安排通報，另床發出呼叫");}
-  if(kind==="aspirin"){v.aspirReport=true;point("aAssess",v.stoolDetail&&v.bruise&&v.vital?2:1,"完成出血風險資料蒐集");point("aReport",v.aspirPrompted?1:2,"完成 Aspirin 疑似出血通報");}
-  if(kind==="shoulder"){v.report=true;point("shoulderAssess",v.onset&&v.score&&v.triggers&&v.arm&&v.exam?2:1,"完成疼痛及患側評估");point("shoulderReport",v.prompted?1:2,"向林醫師報告左肩疼痛與藥膏需求");}
+  if(kind==="glucose"){v.glucoseReported=true;v.focus="glucoseReported";s.bell=true;point("gReport",v.glucosePrompted?1:2,"完成簡短血糖電話通報");note("219床呼叫鈴","217 床已安排通報，另床發出呼叫");}
+  if(kind==="aspirin"){v.aspirReport=true;v.focus="aspirReported";point("aAssess",v.stoolDetail&&v.bruise&&v.vital?2:1,"完成出血風險資料蒐集");point("aReport",v.aspirPrompted?1:2,"完成 Aspirin 疑似出血通報");}
+  if(kind==="shoulder"){v.report=true;v.focus="reported";point("shoulderAssess",v.onset&&v.score&&v.triggers&&v.arm&&v.exam?2:1,"完成疼痛及患側評估");point("shoulderReport",v.prompted?1:2,"向林醫師報告左肩疼痛與藥膏需求");}
   note("醫師通報",r.doctor+"收到完整病況，未擅自代醫師開立新處置");
  }
  modal="reply:"+kind;drawModal();render();
@@ -453,18 +456,42 @@ function act(token){
   const v=s.b217;
   if(b==="meal"||b==="protocol"){
    const safe=v.objective&&v.bg;const score=safe?(v.glucosePrompted?1:2):0;
-   if(safe){v.food=true;v.line="已確認可安全吞嚥，先請病人進食早餐，並同步向陳醫師通報；後續須按臨床指引追蹤低血糖。";note("217處置","先請病人吃早餐並同步通報，安排血糖追蹤");}
-   else{v.glucosePrompted=true;v.line="尚未完成當下意識與安全吞嚥評估，不能直接認定可以安全口服；請先補做必要評估。";note("217安全提示","進食前需完成吞嚥與意識評估");}
+   if(safe){v.food=true;v.focus="food";v.line="已確認可安全吞嚥，先請病人進食早餐，並同步向陳醫師通報；後續須按臨床指引追蹤低血糖。";note("217處置","先請病人吃早餐並同步通報，安排血糖追蹤");}
+   else{v.glucosePrompted=true;v.focus="glucoseUnsafe";v.line="尚未完成當下意識與安全吞嚥評估，不能直接認定可以安全口服；請先補做必要評估。";note("217安全提示","進食前需完成吞嚥與意識評估");}
    point("gAssess",v.objective&&v.meal?2:1,"進食、意識與血糖相關資訊查證");
    point("gAction",score,"首次處置選擇；教學仍需依院內 SOP 驗證");
   }else{
    v.gPriorUnsafe=true;v.glucosePrompted=true;point("gAction",0,"未做適當評估或未通報複測");
-   v.line="這個選擇可能延誤症狀性低血糖處置，需先確認安全吞嚥並同步通報及追蹤。";
+   v.focus="glucoseUnsafe";v.line="這個選擇可能延誤症狀性低血糖處置，需先確認安全吞嚥並同步通報及追蹤。";
   }
   closeModal();render();return;
  }
+ if(a==="quiz"){
+  const v=s.b217,q=v.medQuiz;
+  if(b==="start"){
+   q.index=0;q.firstCorrect=0;q.answer="";q.done=false;
+   v.focus="medQuiz";note("藥品仿單","查閱三種藥物作用，準備逐一配對");
+   closeModal();render();return;
+  }
+  if(b==="next"){
+   if(q.index>=3){
+    q.done=true;v.focus="done";
+    point("famotidine",q.firstCorrect===3?2:q.firstCorrect>=2?1:0,"藥物作用三題，首次正確 "+q.firstCorrect+"/3");
+    note("病人衛教","說明 Famotidine 為抑制胃酸分泌，不需有胃痛才能有用藥適應症");
+   }else v.focus="medQuiz";
+   render();return;
+  }
+  const expected=["asp","fam","met"][q.index];const right=b===expected;
+  if(right)q.firstCorrect++;
+  q.index++;
+  v.focus="medQuizAnswer";
+  q.answer=(right?"✓ 作用配對正確。":"需要再確認藥物作用。")+
+   "　"+(["Aspirin：抗血小板作用，降低血栓形成風險。","Famotidine：抑制胃酸分泌。","Metformin：協助控制血糖。"][q.index-1]);
+  note("藥品作用配對","第 "+q.index+" 種藥物首次選擇："+b+(right?"（正確）":"（需補充）"));
+  render();return;
+ }
  if(a==="aspirin"){
-  const v=s.b217;v.aspirinPlan=true;
+  const v=s.b217;v.aspirinPlan=true;v.focus="aspirinPlan";
   if(b==="safe"){point("med217",v.aspirReport?2:1,"依出血評估及醫師回覆再判斷給藥");v.line="已記錄 Aspirin 給藥前安全判斷；需依醫囑確認本次給藥。";}
   else{point("med217",0,"未評估與通報便自行給藥或停藥");v.line="Aspirin 給藥需結合疑似出血評估及醫囑，不能不經確認直接給藥或自行永久停藥。";}
   note("Aspirin 給藥決策",b);closeModal();render();return;
