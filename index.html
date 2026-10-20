@@ -64,6 +64,26 @@
 .game .console-head .sub{font-size:15px}
 @media(max-width:650px){.patient-line,.patient-interrupt{font-size:16px}.panel-btn{font-size:16px;min-height:58px}}
 .patient-line{font-size:19px;line-height:1.85;margin:4px 0 18px}.panel-btn{min-height:53px;text-align:left}.panel-btn:focus-visible{outline:3px solid #118879;outline-offset:2px}
+
+/* V6: three independent clinical beds, with a manually pushed nursing cart */
+.ward .room{width:31%;height:48%;top:2%;border-width:4px;border-bottom-width:8px}
+.ward .room-left{left:1.2%;right:auto}
+.ward .room-right{left:34.5%;right:auto}
+.ward .room-third{left:67.8%;right:auto}
+.ward .bed-shape{left:29%;width:48%;top:28%;height:54%;border-width:4px}
+.ward .room-label{left:7%;top:5%;font-size:clamp(11px,1.3vw,16px)}
+.ward .spot217{left:3%;top:42%}
+.ward .spot219{left:36%;right:auto;top:42%}
+.ward .spot220{left:70%;right:auto;top:42%}
+.ward .bell{right:38%;top:1%}
+.ward .zone{height:37%;bottom:2%}
+.ward .cart{transition:left .6s ease, top .6s ease;filter:drop-shadow(3px 4px 2px #132a3440)}
+.task-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.task-chips span{display:inline-block;border:1px solid #708c93;padding:4px 7px;font-size:12px}
+.phone-report{background:#f7faf7;color:#203b46;border-left:4px solid #88bcb2;padding:10px 17px;line-height:1.85;margin:12px 0}
+.phone-report p{margin:8px 0}
+.room-third{box-shadow:7px 7px 0 #00000010}
+@media(max-width:650px){.ward{min-height:315px}.ward .room{border-width:3px;border-bottom-width:6px}.ward .clickspot{font-size:11px;padding:5px 6px}.ward .room-label{font-size:11px}.ward .bed-shape{border-width:3px}.phone-report p{font-size:15px}}
 </style>
 </head>
 <body>
@@ -73,7 +93,7 @@
 </div>
 <div class="game hidden" id="game">
 <div class="gamebar"><button class="back" id="backHome">← 回平台首頁</button><span class="gamebrand">NURSESTART <span style="color:var(--lime)">LAB.</span></span><div class="gamestatus"><span id="clock">09:00</span></div></div>
-<div class="game-layout"><section class="ward-wrap"><div class="ward" id="ward"><div class="room room-left"><span class="room-label">217 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket"></div></div><div class="ivstand"></div></div><div class="room room-right"><span class="room-label">219 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#a2c5a7"></div></div><div class="ivstand"></div></div><div class="zone zone-nurse"><span class="zone-label">護理站 / 電腦</span><div class="monitor"></div></div><div class="zone zone-med"><span class="zone-label">治療室 / 配藥</span><div class="vial"></div></div><div class="nurse" id="nurse" style="left:50%;top:54%" aria-label="褲裝女性護理師">
+<div class="game-layout"><section class="ward-wrap"><div class="ward" id="ward"><div class="room room-left"><span class="room-label">217 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket"></div></div><div class="ivstand"></div></div><div class="room room-right"><span class="room-label">219 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#a2c5a7"></div></div><div class="ivstand"></div></div><div class="room room-third"><span class="room-label">220 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#e3d2ab"></div></div></div><div class="zone zone-nurse"><span class="zone-label">護理站 / 電腦</span><div class="monitor"></div></div><div class="zone zone-med"><span class="zone-label">治療室 / 配藥</span><div class="vial"></div></div><div class="nurse" id="nurse" style="left:50%;top:54%" aria-label="褲裝女性護理師">
 <svg viewBox="0 0 58 90" width="58" height="90" role="img" aria-label="穿著藍色背心與長褲的女護理師">
 <ellipse cx="30" cy="86" rx="19" ry="4" fill="#18333c" opacity=".25"/>
 <path d="M23 50 L22 78 L31 78 L32 55 L35 78 L44 78 L40 50Z" fill="#305779" stroke="#23435f" stroke-width="2"/>
@@ -92,352 +112,9 @@
 <rect x="37" y="34" width="7" height="9" fill="#fff" stroke="#54778a"/><path d="M40.5 36 v5 M38 38.5 h5" stroke="#6eaaab" stroke-width="1.3"/>
 </svg></div>
 <button class="cart" id="cart" type="button" title="開啟護理工作車上的給藥清單" aria-label="開啟護理工作車" style="left:57%;top:54%">
-<span class="cart-screen">MAR</span><span class="cart-top"></span><span class="cart-mid"></span><span class="cart-leg"></span><span class="wheel one"></span><span class="wheel two"></span></button><button class="clickspot spot217" data-spot="bed217">去 217 床</button><button class="clickspot spot219" data-spot="bed219">去 219 床</button><button class="clickspot spotdesk" data-spot="desk">查閱資料</button><button class="clickspot spotmed" data-spot="med">治療室</button><div class="bell hidden" id="bell">🔔 219 床按鈴</div></div></section><section class="console" aria-live="polite"><div class="console-head"><h2 id="ctitle">接班開始</h2><p class="sub" id="csub"></p></div><div class="console-body" id="scene"></div></section></div>
+<span class="cart-screen">MAR</span><span class="cart-top"></span><span class="cart-mid"></span><span class="cart-leg"></span><span class="wheel one"></span><span class="wheel two"></span></button><button class="clickspot spot217" data-spot="bed217">去 217 床</button><button class="clickspot spot219" data-spot="bed219">去 219 床</button><button class="clickspot spot220" data-spot="bed220">去 220 床</button><button class="clickspot spotdesk" data-spot="desk">查閱資料</button><button class="clickspot spotmed" data-spot="med">治療室</button><div class="bell hidden" id="bell">🔔 219 床按鈴</div></div></section><section class="console" aria-live="polite"><div class="console-head"><h2 id="ctitle">接班開始</h2><p class="sub" id="csub"></p></div><div class="console-body" id="scene"></div></section></div>
 </div>
 <div class="toast hidden" id="toast" role="status"></div><div class="overlay hidden" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panelTitle"><div class="panel"><div class="panel-top"><h2 id="panelTitle"></h2><button type="button" id="closePanel" aria-label="關閉視窗">✕</button></div><div class="panel-body" id="panelBody"></div></div></div>
-<script>
-
-(()=>{'use strict';
-const $=id=>document.getElementById(id);
-const MEDS=[{id:'aspirin',name:'Aspirin',sub:'黑便 / 瘀青',question:'病人昨晚有深色便，手臂也有不明瘀青。你會怎麼處理 Aspirin？',choices:[['safe','先評估出血徵象、核對醫囑並依規範通報確認'],['unsafe','醫囑存在就直接給，再觀察'],['unsafe','自行永久停藥，不需通報']],lesson:'Aspirin：深色便與瘀青需要進一步釐清；疑似出血時先評估及確認給藥決策，不能只看醫囑存在就逕行給藥。'},{id:'metformin',name:'Metformin',sub:'進食少 / 有症狀血糖',question:'病人早餐只喝幾口豆漿，曾手抖且血糖 68 mg/dL。你會怎麼處理 Metformin？',choices:[['safe','先處理及追蹤症狀，核對病況、腎功能、醫囑並確認是否適合給藥'],['unsafe','因為是口服藥，不必注意進食與病況'],['unsafe','認定手抖一定是 Metformin 單獨造成']],lesson:'Metformin：單獨使用通常不易造成低血糖；仍需依進食、症狀、腎功能、合併用藥與醫囑整體判斷。'},{id:'famotidine',name:'Famotidine',sub:'用藥目的 / 溝通',question:'病人說「我沒有胃痛，這顆胃藥可以不要吃嗎？」你會怎麼做？',choices:[['safe','先核對適應症並說明，了解病人意願與疑慮'],['unsafe','只要沒有胃痛就自行取消醫囑'],['unsafe','不需解釋，直接要求病人吞下']],lesson:'Famotidine：用途應回到處方適應症與病人狀況，不可只根據有沒有胃痛自行決定。'},{id:'acetaminophen',name:'Acetaminophen',sub:'疼痛 / PRN / 總劑量',question:'病人現在只有輕微疼痛，藥車上有 Acetaminophen。你的第一步？',choices:[['safe','確認疼痛與功能影響、常規或 PRN 醫囑、最近給藥與累積劑量'],['unsafe','只要看到止痛藥就先給，避免以後疼痛'],['unsafe','病人目前不太痛就不需看醫囑']],lesson:'Acetaminophen：給藥需要評估疼痛、醫囑性質、最近給藥及累積劑量，避免重複用藥。'}];
-const RANK=[{id:'glucose',text:'先評估手抖與當下血糖，依症狀確認處置需求'},{id:'bleed',text:'釐清黑便、瘀青及其他出血徵象'},{id:'med',text:'核對四種藥物與醫囑、給藥條件'},{id:'record',text:'安排後續追蹤、紀錄與交班'}];
-const STERILE=[{title:'準備前核對',prompt:'拿到新開立的 Cefepime，準備進入治療室，你會先確認？',choices:[['safe','核對病人、醫囑、藥品、適當溶劑及配製要求'],['unsafe','看到藥名一樣就可開始，不必核對其他資料']]},{title:'無菌準備',prompt:'抽藥前應如何維持無菌技術？',choices:[['safe','手部衛生、清潔工作區，依規範消毒藥瓶穿刺處並維持無菌操作'],['unsafe','已清潔工作桌就不需手部衛生與穿刺處消毒']]},{title:'污染處理',prompt:'抽藥時疑似碰觸到應保持無菌的關鍵部位，下一步？',choices:[['safe','停止使用受污染器材並依規範重新準備'],['unsafe','看起來沒有灰塵，可以繼續使用']]}];
-const GROUPS=[{key:'priority',title:'臨床線索與優先順序'},{key:'ivEarly',title:'219 床初次輸液部位評估'},{key:'glucose',title:'血糖異常處置與追蹤'},{key:'interrupt',title:'跨床中斷與任務銜接'},{key:'iv',title:'點滴異常的安全評估'},{key:'aspirin',title:'Aspirin 出血風險辨識'},{key:'metformin',title:'Metformin 病況評估'},{key:'famotidine',title:'Famotidine 適應症與溝通'},{key:'acetaminophen',title:'Acetaminophen 給藥條件'},{key:'culture',title:'抗生素及培養報告查證'},{key:'asep0',title:'無菌抽藥：給藥前核對'},{key:'asep1',title:'無菌抽藥：無菌準備'},{key:'asep2',title:'無菌抽藥：污染應變'},{key:'follow',title:'再評估及交班'}];
-const TIME={brief:'09:00',assessment:'09:01',priority:'09:04',glucose:'09:06',call:'09:10',iv:'09:12',meds:'09:18',culture:'09:28',aseptic:'09:33',follow:'10:05',result:'10:12'};
-const NUM={brief:1,assessment:1,priority:2,glucose:3,call:4,iv:4,meds:5,culture:6,aseptic:7,follow:8,result:8};
-let s;
-function reset(){s={phase:'brief',flags:{talk:false,chart:false,report:false,mar:false},rank:['record','med','bleed','glucose'],scores:{},medChoices:{},activeMed:'aspirin',asepticStep:0,log:[],bad:0,pos:'start',feedback:'',cultureChoice:false,patientAnswers:[],patientNode:'start',patientSeen:[],bloodMeasured:false,glucoseHandled:false,prioritySubmitted:false,bloodDetour:false,handoff:false,ivInitial:{visited:false,site:false,comfort:false,rateAsked:false,verified:false,prompted:false,ratePrompted:false,painPrompted:false,siteDecision:'',siteDetected:false,injury:false,injurySeen:false,complete:false},sterileWrong:[],glucoseWrong:false,ivWrong:false,followWrong:false};save()}
-function save(){try{localStorage.setItem('nursestart-lab-ward-pilot-v5',JSON.stringify(s))}catch(e){}}
-function restore(){try{const t=JSON.parse(localStorage.getItem('nursestart-lab-ward-pilot-v5'));if(t&&typeof t.phase==='string'&&Array.isArray(t.log)&&t.scores&&Array.isArray(t.rank)&&t.flags&&Array.isArray(t.patientAnswers)&&t.ivInitial){s=t;return true}}catch(e){}return false}
-function log(label,value){s.log.push({time:TIME[s.phase]||'09:00',label,value});save()}
-function award(key,score,label,value){if(s.scores[key]===undefined)s.scores[key]=score;log(label,value)}
-function toast(t){$('toast').textContent=t;$('toast').classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').classList.add('hidden'),2600)}
-function pos(at){s.pos=at;const m={start:[50,54],bed217:[27,53],bed219:[73,53],desk:[27,75],med:[73,75]};const p=m[at]||m.start;$('nurse').style.left=p[0]+'%';$('nurse').style.top=p[1]+'%';$('cart').style.left=(p[0]+10)+'%';$('cart').style.top=(p[1]+2)+'%'}
-const B=(text,action,cls='choice')=>`<button type="button" class="${cls}" data-action="${action}">${text}</button>`;
-const next=(text,action)=>`<div class="row-btns">${B(text,action,'mini lime')}</div>`;
-const note=t=>`<div class="note">${t}</div>`;
-function header(tag,title,sub){$('ctitle').textContent=title;$('csub').textContent=sub}
-function page(p){s.phase=p;s.feedback='';save();render()}
-function progress(){ $('clock').textContent=TIME[s.phase]||'09:00';$('bell').classList.toggle('hidden',!(s.phase==='call'||s.phase==='iv')); document.querySelector('.room-right').classList.toggle('active-ring',s.phase==='call'); }
-function showHome(){document.title='NurseStart Lab｜新進護理師學習基地';$('home').classList.remove('hidden');$('game').classList.add('hidden');window.scrollTo({top:0,behavior:'instant'})}
-function showGame(resetGame=false){if(resetGame||!restore())reset();$('home').classList.add('hidden');$('game').classList.remove('hidden');document.title='Ward Quest｜NurseStart Lab';render();window.scrollTo({top:0,behavior:'instant'})}
-function render(){progress();pos(s.pos);let content='';switch(s.phase){
-case 'brief':header('','早班開始','09:00 · 選擇第一個照護地點。');content=`<div class="dialogue"><small>交班護理師</small>「217 床早上的藥還沒確認，219 床正在輸液。你想先去哪一床？」</div>${s.ivInitial.complete?`<div class="note">219 床已完成輸液評估，可以繼續其他工作。</div>`:''}<div class="choices">${B('前往 217 床｜準備給藥','goto:bed217')}${B('前往 219 床｜檢查點滴','goto:bed219')}${B('先去護理站｜查看資料','goto:desk')}</div>`;break;
-case 'assessment':header('','217 床｜床旁評估','可自行與病人訪談、評估或查閱資料。');
- content='<div class="dialogue"><small>217 床病人</small>「護理師，我覺得不太舒服，昨天沒有這樣。」</div>'+
- (s.bloodMeasured&&!s.glucoseHandled?'<div class="note warning">已測得血糖 68 mg/dL，請評估並處理當下症狀。</div>'+next('處理當下症狀及血糖','gotoGlu'):'<p class="action-help">點選病床進入對話，依新資訊決定行動。</p>');
- break;
-case 'priority':header('03 / DECISION QUEUE','臨床行動｜你會先做什麼？','依目前取得的資訊調整行動順序。可用 ↑ ↓ 移動，不是以完成最快為目的。');content=`<p class="kicker">217 BED / LIVE PRIORITY LIST</p><div>${s.rank.map((id,i)=>{const a=RANK.find(x=>x.id===id);return `<div class="rankrow"><span class="num">${i+1}</span><span>${a.text}</span><button class="arrow" aria-label="將${a.text}往上移動" data-action="rankUp:${i}" ${i===0?'disabled':''}>↑</button><button class="arrow" aria-label="將${a.text}往下移動" data-action="rankDown:${i}" ${i===s.rank.length-1?'disabled':''}>↓</button></div>`}).join('')}</div>${note('所有項目都重要，但急迫性不同。臨床情境並不一定只有一種固定的完整排序。')}${next('確認此刻的優先順序','submitRank')}`;break;
-case 'glucose':header('','217 床｜手抖，血糖 68 mg/dL','GCS E4V5M6；Pupil size 2.0 mm (+) OU。意識清楚，須確認吞嚥安全與醫囑。');
- content='<div class="dialogue"><small>病人</small>「我手還在抖，覺得有點虛。」</div><div class="choices">'+
- B('確認可安全吞嚥，依院內流程給予適當醣類、同步通報、安排複測','glu:protocol')+
- B('確認意識與吞嚥安全，協助病人進食，同步通報並依院內流程追蹤血糖','glu:meal')+
- B('先請家屬自行餵食，無須通報或複測','glu:unsafeFood')+
- B('照常給 Metformin，等待下一次常規血糖','glu:unsafeMed')+
- '</div>'+(s.feedback?'<div class="note warning">'+s.feedback+'</div>'+next('修正處置並繼續值班','glucoseFix'):'');
- break;
-case 'call':header('','🔔 219 床呼叫中','請自行前往 219 床評估。');
- content='<div class="dialogue"><small>219 床</small>「護理師，可以麻煩你再過來看一下點滴嗎？」</div>'+
- (!s.handoff?B('安排 217 床必要的後續追蹤與交接','handoff'):'<p class="action-help">✓ 已安排 217 床後續追蹤</p>');
- break;
-case 'iv':{
- const replaced=s.ivInitial.siteDecision==='replace';
- const title=replaced?'219 床｜新通路警示聲':'219 床｜輸液部位再次不適';
- const say=replaced?'護理師，點滴機器一直叫。':'護理師，點滴的地方越來越不舒服。';
- header('',title,replaced?'幫浦警示，請查找警示原因並檢查管路。':'病人回報局部疼痛，須評估輸液部位及通路安全。');
- content='<div class="dialogue"><small>219 床病人</small>「'+say+'」</div><div class="choices">'+
- (replaced?B('核對幫浦警示與輸液醫囑，檢視管路，依規範排除原因','iv:safe'):B('停止使用有疑慮的通路，評估穿刺處並依規範處置／通報','iv:safe'))+
- B('不用檢查，直接強行沖管','iv:unsafe')+
- B('還能滴就先不理會，回去給藥','iv:ignore')+
- '</div>'+(s.feedback?'<div class="note warning">'+s.feedback+'</div>'+next('重新評估並採取安全處置','ivFix'):'');
- break;}
-case 'meds':{header('','217 床｜給藥判斷',s.pos!=='bed217'?'請自己點選 217 床，回到病人旁。':!s.flags.mar?'點選跟著護理師的工作車，查閱給藥清單。':'點選給藥清單中的藥物，判斷是否適合給藥。');if(s.pos!=='bed217'){content=`<div class="dialogue"><small>219 床處置後</small>217 床還有待確認的給藥任務。</div>`;break;}if(!s.flags.mar){content=`<div class="dialogue"><small>217 床病人</small>「我現在可以吃藥了嗎？」</div>${B('打開護理工作車','openCart')}`;break;}const m=MEDS.find(x=>x.id===s.activeMed)||MEDS[0];const medPrompt=(m.id==='acetaminophen'&&!s.patientSeen?.includes('painScore'))?'給藥清單有 Acetaminophen，但你尚未完成當下疼痛評估。現在需要先確認哪些條件？':(m.id==='aspirin'&&!s.patientSeen?.includes('stoolIntro'))?'給藥清單有 Aspirin；病人情況仍有待釐清。你要確認哪些出血相關風險？':m.question;content=`<div class="medgrid">${MEDS.map(x=>`<button class="medtile ${s.medChoices[x.id]?'done':''} ${s.activeMed===x.id?'active':''}" data-action="selectMed:${x.id}"><b>${x.name}</b></button>`).join('')}</div><div class="dialogue" style="margin-top:17px">${medPrompt}</div>${s.medChoices[m.id]?`<p class="action-help">✓ 已記錄這次判斷</p>`:`<div class="choices">${m.choices.map(c=>B(c[1],`medDecision:${m.id}:${c[0]}`)).join('')}</div>`}${Object.keys(s.medChoices).length===4?next('完成用藥判斷','toCulture'):`<p class="action-help">${Object.keys(s.medChoices).length} / 4 種藥物已判斷</p>`}`;break;}
-
-case 'culture':header('','217 床｜新抗生素醫囑',s.pos==='desk'?'在護理站查閱醫囑、培養及藥敏資料。':'電腦有新醫囑，請前往護理站。');content=s.pos!=='desk'?`<div class="dialogue"><small>電子醫囑通知</small>原 Clindamycin 已調整為 Cefepime。</div>`:`<div class="dialogue"><small>新醫囑</small>Clindamycin → Cefepime</div>${B('打開護理站電腦','openDesk')}${s.flags.report?'<p class="action-help">✓ 已查閱細菌培養與藥敏報告</p>':''}<div class="choices">${B('確認培養報告、過敏、腎功能、醫囑及配製方式後再準備','culture:safe')}${B('看到 Cefepime 為 S，就立即施打，不需其他查核','culture:unsafe')}${B('照舊施打 Clindamycin，忽略新醫囑','culture:ignore')}</div>`;break;
-
-case 'aseptic':{const a=STERILE[s.asepticStep];header('',`治療室｜${a.title}`,s.pos!=='med'?'請點選左側治療室，前往備藥台。':'無菌抽藥，請選擇下一步。');content=s.pos!=='med'?`<div class="dialogue"><small>待配製藥物</small>Cefepime 醫囑變更已確認，前往治療室準備。</div>`:`<div class="dialogue"><small>備藥台</small>${a.prompt}</div><div class="choices">${a.choices.map(x=>B(x[1],`aseptic:${x[0]}`)).join('')}</div>${s.feedback?`<div class="note warning">${s.feedback}</div>${next('重新採取符合無菌原則的做法','asepticFix')}`:''}`;break;}
-
-case 'follow':header('','回到病房｜追蹤與交班',s.pos==='bed217'?'你會怎麼追蹤病人狀況？':'請回到 217 床完成評估。');content=s.pos==='bed217'?`<div class="dialogue"><small>資深護理師</small>「217 床手抖、深色便的狀況需要追蹤；219 床的點滴處理後，也別忘了再評估。」</div><div class="choices">${B('追蹤血糖、出血徵象、感染反應及輸液部位，完成紀錄與交班','follow:safe')}${B('已配好藥物，就不用再觀察','follow:unsafe')}</div>${s.feedback?`<div class="note warning">${s.feedback}</div>${next('補做再評估，完成交班','followFix')}`:''}`:`<div class="dialogue"><small>床旁任務</small>病人仍需要重新評估。</div>`;break;
-
-case 'result':{header('COMPLETE / DEBRIEF','任務完成｜你看見哪些線索？','這是第一次遊戲決策紀錄，可用於教師回饋，不是臨床能力或 EPA 信賴等級認證。');const activeGroups=GROUPS.filter(g=>g.key!=='ivEarly'||s.ivInitial.visited);const earned=activeGroups.reduce((a,g)=>a+(Number(s.scores[g.key])||0),0),max=activeGroups.length*2;const pct=Math.round(100*earned/max);const short=activeGroups.filter(g=>(s.scores[g.key]||0)<2);content=`<p class="kicker">DECISION REVIEW · ${max} 分制／試玩版規準</p><div class="resultbig">${earned}<small style="font-size:20px;color:#a1b9be;letter-spacing:0"> / ${max}</small></div><div class="score-track"><div class="score-fill" style="width:${pct}%"></div></div><div class="results">${activeGroups.map(g=>`<div class="result-row"><span>${g.title}</span><b class="${s.scores[g.key]===2?'good':'needs'}">${s.scores[g.key]||0} / 2</b></div>`).join('')}</div>${short.length?`<div class="note warning"><b>建議教師討論</b><br>${short.map(g=>'• '+g.title).join('<br>')}</div>`:note('你已在本次模擬中完成所有設定的安全判斷項目。仍需透過臨床教師實地觀察確認能力。')}<div class="note"><b>交班時的路徑紀錄</b><br>${s.ivInitial.visited?(s.ivInitial.complete?((s.ivInitial.painPrompted?'留置針：病人提醒後評估。':'留置針：自主評估。')+' '+(s.ivInitial.ratePrompted?'滴速：病人詢問後核對。':'滴速：主動核對。')):'219 床：初始輸液評估尚未完成。'):'先從 217 床或護理站開始，未執行 219 床初始點滴檢視。'}${s.ivInitial.visited?'<br>留置針部位：'+(s.ivInitial.siteDecision==='replace'?'已依規範處置疑似靜脈炎':s.ivInitial.injury?'延遲處置後出現疑似靜脈炎損傷':s.ivInitial.site?'已檢視，處置待確認':'未主動檢視'):''}<br>首次選擇保留於評分，事後補救另記錄學習歷程。</div><div class="note"><b>評分規準</b><br>2 分：自主辨識與處置；1 分：病人提醒或延遲後才完成；0 分：首次選擇忽略風險或不安全處置。補做會保留於操作歷程，不回補初次選擇分數。</div><div class="note"><b>前測對照建議</b><br>題 1：先問什麼 → 線索蒐集／初始排序<br>題 2：黑便及進食 → 出血與血糖相關評估<br>題 3：血糖 68 且手抖 → 優先處置及再評估<br>題 4：Clindamycin 改 Cefepime → 報告查證／無菌配藥<br><br>此試玩版尚未串接前測作答紀錄，不能直接計算前後測改善幅度。</div><div class="row-btns">${B('複製我的回顧紀錄','copyResult','mini lime')}${B('重新試玩','restart','mini')}${B('返回首頁','home','mini')}</div><div class="edu">無菌技術及急性症狀處置均須以機構現行規範為準。模擬評分僅反映所選選項，不能替代直接觀察或可信賴程度評量。</div>`;break;}
-}
-$('scene').innerHTML=content;save()}
-function act(action){if(!action)return;const [a,b,c]=action.split(':');if(a==='begin'){page('brief');return}if(a==='goto'){spot(b);return}if(a==='handoff'){s.handoff=true;log('217床追蹤','確認血糖處置及後續追蹤交接');render();return}if(a==='openDesk'){openPanel('desk','orders');return}if(a==='openCart'){openPanel('cart');return}if(a==='talk'){s.flags.talk=true;pos('bed217');log('病人訪談','取得進食少、深色便、瘀青、手抖、疼痛資訊');render();return}if(a==='chart'){s.flags.chart=true;pos('desk');log('查核紀錄','查閱血糖、用藥清單及藥物過敏史');render();return}if(a==='toPriority'||a==='gotoGlu'){page('glucose');return}if(a==='rankUp'||a==='rankDown'){const i=Number(b),j=i+(a==='rankUp'?-1:1);if(j>=0&&j<s.rank.length)[s.rank[i],s.rank[j]]=[s.rank[j],s.rank[i]];render();return}if(a==='submitRank'){let score=0;if(s.rank[0]==='glucose')score=2;else if(s.rank.indexOf('glucose')===1)score=1;award('priority',score,'動態排序',s.rank.map(id=>RANK.find(x=>x.id===id).text).join(' → '));s.prioritySubmitted=true;page(s.glucoseHandled?'call':'glucose');return}if(a==='glu'){
-  const safe=b==='protocol'||b==='meal';
-  const seqScore=safe?(s.bloodDetour?1:2):0;
-  award('priority',seqScore,'臨床優先順序',safe?(seqScore===2?'確認血糖後及時處理':'處理前曾延遲或轉往其他任務'):'首次採取不安全處置');
-  award('glucose',safe?2:0,'血糖68處置',b);
-  if(safe){s.glucoseHandled=true;log('低血糖後續','安排依院內規範複測，並同步通報');page('call');}
-  else{s.feedback='病人血糖 68 mg/dL 且手抖：應評估吞嚥安全，依院內低血糖流程提供適當醣類、同步通報並複測；不可只依一般進食或照常給藥取代評估。';s.glucoseWrong=true;render();}
-  return;
- }
- if(a==='glucoseFix'){log('補做安全處置','依院內低血糖流程安排適當醣類、同步通報與複測');s.glucoseHandled=true;page('call');return;}
- if(a==='interrupt'){award('interrupt',b==='safe'?2:b==='unsafe'?0:0,'工作中斷','回應219床呼叫鈴：'+b);pos('bed219');page('iv');return}if(a==='iv'){const ok=b==='safe';award('iv',ok?2:0,'輸液部位評估',b);if(ok){page('meds')}else{s.feedback='輸液疼痛、紅腫或幫浦警示均須查明原因，不可強行沖管或忽視警訊，應依院內規範採取安全處置。';s.ivWrong=true;render()}return}if(a==='ivFix'){log('補做管路安全處置','停止不安全處置並依規範評估');page('meds');return}if(a==='selectMed'){s.activeMed=b;pos('bed217');render();return}if(a==='medDecision'){if(s.medChoices[b])return;const m=MEDS.find(x=>x.id===b);s.medChoices[b]=c;award(b,c==='safe'?2:0,m.name+'給藥決策',c);const nextMed=MEDS.find(x=>!s.medChoices[x.id]);if(nextMed)s.activeMed=nextMed.id;render();return}if(a==='toCulture'){page('culture');return}if(a==='viewReport'){s.flags.report=true;pos('desk');log('細菌培養報告','主動查閱血液培養 Acinetobacter spp.、Cefepime S');render();return}if(a==='culture'){award('culture',b==='safe'?(s.flags.report?2:1):0,'抗生素醫囑變更',b+'／已閱報告:'+s.flags.report);s.asepticStep=0;page('aseptic');return}if(a==='aseptic'){const key='asep'+s.asepticStep;const ok=b==='safe';award(key,ok?2:0,'無菌抽藥：'+STERILE[s.asepticStep].title,b);if(ok){if(s.asepticStep<STERILE.length-1){s.asepticStep++;s.feedback='';render()}else{page('follow')}}else{s.feedback='這個選擇有無菌風險。疑似污染須停止使用受污染器材，依院內規範重新準備。';s.sterileWrong.push(s.asepticStep);render()}return}if(a==='asepticFix'){log('無菌操作修正','更換受污染器材並依規範重新準備');if(s.asepticStep<STERILE.length-1){s.asepticStep++;s.feedback='';render()}else{page('follow')}return}if(a==='follow'){const ok=b==='safe';award('follow',ok?2:0,'再評估／交班',b);if(ok)page('result');else{s.feedback='需要重新評估血糖與症狀、疑似出血風險、感染治療反應及 219 床管路狀況，完成紀錄與交班。';render()}return}if(a==='followFix'){log('補做再評估','追蹤病情、紀錄與交班');page('result');return}if(a==='restart'){reset();render();return}if(a==='home'){showHome();return}if(a==='copyResult'){const activeGroups=GROUPS.filter(g=>g.key!=='ivEarly'||s.ivInitial.visited);const earned=activeGroups.reduce((n,g)=>n+(s.scores[g.key]||0),0);const rows=[`NurseStart Lab｜病房任務試玩紀錄`,`總分 ${earned}/${activeGroups.length*2}`,...activeGroups.map(g=>`${g.title}：${s.scores[g.key]||0}/2`),`初始 219 床輸液觀察：${!s.ivInitial.visited?'尚未檢視':s.ivInitial.complete?(s.ivInitial.prompted?'病人提醒後完成':'自主完成'):'尚未完成'}`,'','操作紀錄：',...s.log.map(x=>`${x.time}｜${x.label}｜${x.value}`),'','本次評分採 2 分自主完成、1 分經提醒完成、0 分不安全首次選擇；非 EPA 信賴等級。'];const text=rows.join('\n');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>toast('已複製學習回顧，可貼給臨床教師。')).catch(()=>fallbackCopy(text))}else fallbackCopy(text);return}}
-function fallbackCopy(t){const el=document.createElement('textarea');el.value=t;el.style.position='fixed';el.style.left='-9999px';document.body.appendChild(el);el.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}el.remove();toast(ok?'已複製回顧紀錄':'瀏覽器不允許複製，請使用桌面瀏覽器再試。')}
-
-const PATIENT_NODES={
- start:{say:'護理師，我覺得不太舒服，昨天沒有這樣。',options:[
-  ['可以請你再描述清楚一點嗎？例如哪裡不舒服、是什麼感覺，之前有這樣過嗎？','go:tremor'],
-  ['執行意識狀態與瞳孔反應評估。','go:observe'],
-  ['請您稍等一下，我先查閱先前的生命徵象與紀錄，再回來了解。','goto:desk']]},
- observe:{say:'客觀評估：GCS E4V5M6；Pupil size：2.0 mm (+) OU。病人能正常對答，觀察到手抖。',options:[
-  ['你的手好像在抖，是什麼時候開始的？','go:tremorOnset'],
-  ['我先幫你測量血糖。','go:measure'],
-  ['你可以描述一下哪裡不舒服嗎？','go:tremor']]},
- tremor:{say:'我手有點抖，整個人也沒有力氣。以前偶爾有過，但這次比較明顯。',options:[
-  ['什麼時候開始的？手抖有持續嗎？','go:tremorOnset'],
-  ['今天早上有吃東西嗎？吃了多少？','go:meal'],
-  ['我先評估並幫你測血糖。','go:measure'],
-  ['除了手抖，還有其他不舒服的地方嗎？','go:extras']]},
- tremorOnset:{say:'剛剛開始的，到現在還有點抖，也覺得虛弱。',options:[
-  ['有冒冷汗、頭暈或心悸嗎？','go:symptoms'],
-  ['早上有吃東西嗎？','go:meal'],
-  ['我先評估並幫你測血糖。','go:measure']]},
- symptoms:{say:'剛才有點冒汗，沒有明顯頭暈。其他情形還需要你評估。',options:[
-  ['先評估意識和症狀，測量血糖。','go:measure'],
-  ['早餐實際吃了什麼？','go:meal'],
-  ['還有別的地方不舒服嗎？','go:extras']]},
- meal:{say:'只喝了幾口豆漿，其他東西沒吃，沒有胃口。',options:[
-  ['我先評估並幫你測血糖。','go:measure'],
-  ['這樣的手抖是從什麼時候開始的？','go:tremorOnset'],
-  ['除了手抖，還有其他不舒服嗎？','go:extras']]},
- measure:{say:'床邊血糖：68 mg/dL；GCS E4V5M6，Pupil size：2.0 mm (+) OU。病人手抖、虛弱，需確認吞嚥安全及依院內低血糖處置流程執行。',options:[
-  ['先處理當下的血糖與症狀。','actGlu:now'],
-  ['我先查閱其他用藥與醫囑。','goto:desk'],
-  ['處理後再確認其他不舒服。','go:extras']]},
- extras:{say:'右膝蓋有時會痠痛。另外，昨天晚上大便顏色看起來比平常深。',options:[
-  ['右膝蓋怎麼痛？先了解一下。','go:painIntro'],
-  ['大便顏色不一樣？我想再確認。','go:stoolIntro'],
-  ['手抖還在，先評估血糖。','go:measure']]},
- painIntro:{say:'右膝蓋有點痠，走路時比較明顯。',options:[
-  ['什麼時候開始？以前有發生過嗎？','go:painOnset'],
-  ['是什麼感覺的痛？在哪個範圍？','go:painQuality'],
-  ['如果 0 分不痛、10 分最痛，現在大約幾分？','go:painScore']]},
- painOnset:{say:'早上起來活動時開始的，以前偶爾也會這樣。',options:[
-  ['可以形容一下疼痛的感覺和位置嗎？','go:painQuality'],
-  ['現在大約痛幾分？','go:painScore'],
-  ['什麼情況會變得比較痛或好一點？','go:painFactor']]},
- painQuality:{say:'是痠痠、悶悶的感覺，不是刺痛，主要就在右膝蓋附近。',options:[
-  ['現在疼痛大約幾分？','go:painScore'],
-  ['什麼時候會加重？會影響走路嗎？','go:painFactor'],
-  ['先確認止痛藥的醫囑。','goto:cart']]},
- painScore:{say:'大概 2 分，休息時沒有那麼明顯。',options:[
-  ['活動時會更痛嗎？走路受影響嗎？','go:painFactor'],
-  ['我先確認止痛藥的使用條件。','goto:cart'],
-  ['剛剛你提到大便顏色改變？','go:stoolIntro']]},
- painFactor:{say:'站起來走路會比較痠，休息後會好一些。',options:[
-  ['我先核對 Acetaminophen 的醫囑與最近給藥。','goto:cart'],
-  ['你說昨晚大便顏色變深，可以描述一下嗎？','go:stoolIntro'],
-  ['我先確認手抖和血糖的狀況。','go:measure']]},
- stoolIntro:{say:'昨晚有排便一次，看起來比平常深，我也不確定是不是黑色。',options:[
-  ['是深咖啡色、黑色，還是像柏油？性質如何？','go:stoolColor'],
-  ['排便幾次？大概多少量？','go:stoolCount'],
-  ['有頭暈、瘀青或其他出血情形嗎？','go:stoolBleed']]},
- stoolColor:{say:'看起來偏黑、比較黏，沒有仔細注意量。',options:[
-  ['這樣的排便出現幾次？','go:stoolCount'],
-  ['還有其他出血徵象或不舒服嗎？','go:stoolBleed'],
-  ['以前有這樣嗎？最近吃了什麼藥？','go:stoolMeds']]},
- stoolCount:{say:'昨晚一次，今天還沒有。量沒有特別注意。',options:[
-  ['有沒有頭暈、瘀青或其他出血？','go:stoolBleed'],
-  ['以前也有這樣嗎？最近有服用鐵劑或其他藥物嗎？','go:stoolMeds'],
-  ['我先檢查生命徵象及出血徵象。','go:stoolObserve']]},
- stoolBleed:{say:'手臂有幾塊瘀青，其他地方沒有特別注意。',options:[
-  ['我先檢查皮膚、生命徵象及其他出血徵象。','go:stoolObserve'],
-  ['我想確認你昨晚便色和便量。','go:stoolColor'],
-  ['核對抗血小板藥物與相關醫囑。','goto:cart']]},
- stoolObserve:{say:'你發現手臂有瘀青；深色便的原因仍需釐清，不能直接當成確診消化道出血。',options:[
-  ['查閱 Aspirin 用藥資料與醫囑，依情況通報。','goto:desk'],
-  ['再確認便色、次數與相關藥物。','go:stoolMeds'],
-  ['手抖也需要即時處理，先去測血糖。','go:measure']]},
- stoolMeds:{say:'我不太記得最近有沒有吃會讓大便變色的藥。可以幫我看看嗎？',options:[
-  ['查詢醫囑、藥物使用與相關紀錄。','goto:desk'],
-  ['再評估是否有出血徵象。','go:stoolObserve'],
-  ['先回頭確認手抖的狀況。','go:measure']]}
-};
-let panelKind='', ehrTab='orders';
-
-
-const IV_EARLY=[
- {id:'site',q:'觀察穿刺部位，依規範隔著敷料輕觸評估壓痛',a:'入針處周圍有局部泛紅；隔著完整敷料評估，病人暫未表示壓痛。仍須判斷是否出現靜脈炎徵象。'},
- {id:'comfort',q:'詢問輸液部位是否疼痛、灼熱或不舒服',a:'病人：「目前不會痛，不過我沒注意那個地方。」'}
-];
-function ivEarlyScore(score,label){
- award('ivEarly',score,'219床初次輸液判斷',label);
-}
-function earlyIvPanel(){
- const f=s.ivInitial;
- $('panelTitle').textContent='219 床｜輸液評估';
- let content='<div class="patient-line">病人：「護理師，早安。」</div>';
- if(f.injury&&!f.injurySeen){
-  content+='<div class="patient-interrupt"><b>稍後｜病況變化</b><p>留置針周圍發紅範圍擴大，局部變熱且有壓痛，病人說手越來越痛。這些是疑似靜脈炎的警訊，不可繼續原通路輸液。</p></div>';
-  content+='<button class="panel-btn" data-panel-action="ivEarly:injuryReview">停止使用原通路、移除留置針並依規範重新評估／通報</button>';
-  $('panelBody').innerHTML=content;return;
- }
- if(f.injury&&f.injurySeen){
-  content+='<div class="panel-answer">已進行疑似靜脈炎處置。初次不安全選擇已保留於紀錄與評分。</div>';
- }
- if(f.siteDetected&&!f.siteDecision&&!f.injury){
-  content+='<div class="patient-interrupt"><b>護理師心裡想</b><p>「感覺入針處周邊紅紅的，即使病人沒有喊痛，還是需要判斷這個通路能不能繼續用。」</p></div>';
-  content+='<button class="panel-btn" data-panel-action="ivEarly:replace">停止使用原通路，依院內規範評估並移除疑似靜脈炎留置針，必要時另建通路</button>';
-  content+='<button class="panel-btn" data-panel-action="ivEarly:ignore">沒有疼痛，還能滴，先繼續使用</button>';
- }else if(f.painPrompted&&!f.siteDecision&&!f.injury){
-  content+='<div class="patient-interrupt"><b>病人叫住護理師</b><p>「護理師，我的手有點痛，可以幫我看一下嗎？」</p></div>';
-  content+='<button class="panel-btn" data-panel-action="ivEarly:site">返回查看留置針部位，評估紅腫熱痛</button>';
-  content+='<button class="panel-btn" data-panel-action="ivEarly:ignore">點滴還能滴，晚點再處理</button>';
- }else if(!f.siteDecision&&!f.injury){
-  content+=IV_EARLY.map(q=>`<button class="panel-btn" data-panel-action="ivEarly:${q.id}">${f[q.id]?'✓ ':''}${q.q}</button>${f[q.id]?`<div class="panel-answer">${q.a}</div>`:''}`).join('');
- }
- if(f.siteDecision==='replace')content+='<div class="panel-answer">已停止使用有疑慮的留置針並完成必要處置。若仍需輸液，依規範重新建立通路。</div>';
- if(!f.verified){
-  if(f.ratePrompted){
-   content+='<div class="patient-interrupt"><b>病人又提出疑問</b><p>「護理師，現在點滴滴得好像比昨天快，這樣正常嗎？」</p></div>';
-  }
-  content+='<button class="panel-btn" data-panel-action="goto:cart">打開工作車，核對 219 床輸液醫囑與幫浦設定</button>';
- }else content+='<div class="panel-answer">已核對本次輸液醫囑與實際設定一致。</div>';
- content+='<button class="panel-btn main-action" data-panel-action="goto:bed217">前往 217 床</button>';
- $('panelBody').innerHTML=content;
-}
-function earlyIvAction(action){
- const f=s.ivInitial;
- if(action==='site'){
-   f.site=true;f.siteDetected=true;
-   log('219床留置針觀察',f.painPrompted?'經病人提醒才檢視，發現周圍泛紅':'自主檢查發現入針處泛紅');
-   earlyIvPanel();save();return;
- }
- if(action==='comfort'){f.comfort=true;log('219床輸液訪談','詢問輸液部位不適');earlyIvPanel();save();return;}
- if(action==='verified'){
-   f.verified=true;
-   log('219床輸液醫囑','透過工作車核對流速與輸液內容，教學模擬 60 mL/hr');
-   openPanel('bed219initial');return;
- }
- if(action==='replace'){
-   f.siteDecision='replace';
-   ivEarlyScore(f.painPrompted?1:2,f.painPrompted?'病人提醒後辨識並處置留置針異常':'主動觀察發現異常並處置');
-   log('219床留置針處置','停止原通路，移除疑似靜脈炎留置針並視需要另建通路');
-   earlyIvPanel();save();return;
- }
- if(action==='ignore'){
-   f.siteDecision='ignore';f.injury=true;
-   ivEarlyScore(0,'首次選擇繼續使用有疑慮的通路');
-   log('219床風險選擇','忽略局部泛紅或疼痛，模擬經過一段時間後症狀惡化');
-   earlyIvPanel();save();return;
- }
- if(action==='injuryReview'){
-   f.injurySeen=true;
-   log('219床疑似靜脈炎後續','重新評估紅腫熱痛、停止輸液、移除原通路與紀錄通報');
-   earlyIvPanel();save();return;
- }
-}
-function moveFromEarly219(){
- const f=s.ivInitial;
- if(f.injury&&!f.injurySeen){earlyIvPanel();save();return;}
- if(!f.siteDecision){
-   if(!f.painPrompted){f.painPrompted=true;log('219床病人提醒','未主動確認穿刺部位，病人表示手部疼痛');}
-   earlyIvPanel();save();return;
- }
- if(!f.verified){
-   if(!f.ratePrompted){f.ratePrompted=true;f.prompted=true;log('219床病人提醒','病人詢問為何點滴看起來比昨天快');}
-   earlyIvPanel();save();return;
- }
- if(!f.complete){
-   f.complete=true;
-   log('219床初次輸液評估結束',f.injury?'延遲辨識後補做疑似靜脈炎處置':'完成穿刺部位與醫囑滴速確認');
- }
- panelClose();pos('bed217');page('assessment');openPanel('bed217');
-}
-
-function panelClose(){ $('overlay').classList.add('hidden');panelKind=''; }
-function openPanel(kind, tab){panelKind=kind; if(tab)ehrTab=tab;
- if(kind==='desk'&&!s.flags.chart){s.flags.chart=true;log('病歷查閱','主動前往護理站查閱電子病歷');}
- if(kind==='cart'&&!s.flags.mar&&s.pos!=='bed219'){s.flags.mar=true;log('工作車','主動開啟 MAR 給藥清單');}
- if(kind==='bed217'){if(!s.patientNode)s.patientNode='start';if(!Array.isArray(s.patientSeen))s.patientSeen=[];}
- $('overlay').classList.remove('hidden'); drawPanel();render();}
-function tr(label,content){return `<tr><th>${label}</th><td>${content}</td></tr>`}
-function drawPanel(){const body=$('panelBody');if(panelKind==='bed217'){
- $('panelTitle').textContent='217 床｜床旁對話';
- const n=PATIENT_NODES[s.patientNode]||PATIENT_NODES.start;
- const previous=s.patientNode!=='start' ? '<button type="button" class="panel-btn" data-panel-action="go:tremor">回到手抖與虛弱的評估</button>' : '';
- body.innerHTML='<div class="patient-line">病人：「'+n.say+'」</div>'+
- n.options.map(o=>'<button type="button" class="panel-btn" data-panel-action="'+o[1]+'">'+o[0]+'</button>').join('')+
- (s.patientNode==='tremor'||s.patientNode==='extras'||s.patientNode==='measure'?'':previous);
- }else if(panelKind==='bed219initial'){
- earlyIvPanel();
- }else if(panelKind==='desk'){
- $('panelTitle').textContent='護理站｜電子病歷';
- const tabs=[['orders','醫囑'],['vital','血糖與紀錄'],['culture','培養報告'],['allergy','過敏史']];
- let data='';const changed=['culture','aseptic','follow','result'].includes(s.phase);
- if(ehrTab==='orders')data=`<div class="record-head">217 床　·　模擬醫囑摘要</div><table class="record">${tr('口服藥','Aspirin / Metformin / Famotidine / Acetaminophen')}${tr('抗生素',changed?'Clindamycin 停用／Cefepime 新增':'Clindamycin（目前使用）')}${tr('處方細節','劑量、給藥時間與適應症均需於正式系統核對；本情境未提供完整處方。')}</table>`;
- if(ehrTab==='vital')data=`<div class="record-head">217 床　·　模擬血糖紀錄</div><table class="record">${tr('昨日 06:30','108 mg/dL')}${tr('昨日 21:00','126 mg/dL')}${s.bloodMeasured?tr('今日床邊血糖','68 mg/dL'):''}</table>`;
- if(ehrTab==='culture'&&!changed){data=`<div class="record-head">217 床　·　Blood culture</div><p>目前仍在檢驗中，尚未發出最終培養及藥敏報告。</p>`;}
- if(ehrTab==='culture'&&changed){if(!s.flags.report){s.flags.report=true;log('培養報告','查看血液培養結果與藥敏，Cefepime S');}
- data=`<div class="record-head">217 床　·　Blood culture（教學模擬）</div><table class="record">${tr('Gram stain','GNB')}${tr('培養結果','Acinetobacter spp.')}${tr('Cefepime','S（感受性）')}${tr('其他藥敏','需查看完整培養及感受性資料')}${tr('提醒','判讀結果須合併感染情境及醫囑，不單憑 S 決定給藥。')}</table>`;}
- if(ehrTab==='allergy')data=`<div class="record-head">217 床　·　藥物過敏史</div><table class="record">${tr('既往紀錄','Vancomycin HCl')}${tr('反應','Skin rash')}${tr('提醒','須核對擬使用藥物的過敏及交叉過敏風險。')}</table>`;
- body.innerHTML=`<div class="panel-tabs">${tabs.map(t=>`<button type="button" class="${ehrTab===t[0]?'active':''}" data-panel-action="tab:${t[0]}">${t[1]}</button>`).join('')}</div>${data}`;
-  }else if(panelKind==='cart'){
-  if(s.pos==='bed219'){
-    $('panelTitle').textContent='219 床｜輸液醫囑';
-    body.innerHTML='<div class="record-head">219 床 · 輸液醫囑（教學模擬）</div><table class="record">'+
-     tr('輸液種類','0.9% Sodium Chloride 500 mL')+
-     tr('醫囑流速','60 mL/hr')+tr('目前幫浦設定','60 mL/hr')+
-     tr('管路','周邊靜脈留置針')+'</table>'+
-     '<button class="panel-btn" data-panel-action="ivEarly:verified">已核對醫囑與實際設定</button>'+
-     '<button class="panel-btn" data-panel-action="goto:bed219">返回 219 床</button>';
-  }else{
-    $('panelTitle').textContent='護理工作車｜MAR';
-    body.innerHTML=`<div class="record-head">217 床 · 模擬給藥清單</div><table class="record">${MEDS.map(m=>`<tr><th>${m.name}</th><td>${s.medChoices[m.id]?'已完成決策紀錄':'請核對醫囑與病況'}</td></tr>`).join('')}</table><button class="panel-btn" data-panel-action="goto:desk">前往護理站查詢醫囑 →</button>`;
-  }
- }}
-function panelAct(action){const [a,v]=action.split(':');
- if(a==='go'){
-   if(!PATIENT_NODES[v])return;
-   if(!Array.isArray(s.patientSeen))s.patientSeen=[];
-   if(!s.patientSeen.includes(v)){s.patientSeen.push(v);log('217床對話分支',v);}
-   s.patientNode=v;
-   s.flags.talk=true;
-   if(s.bloodMeasured&&!s.glucoseHandled&&v!=='measure'){s.bloodDetour=true;log('優先順序延遲','測得低血糖後暫未執行處置，轉入其他對話');}
-   if(v==='measure'&&!s.bloodMeasured){s.bloodMeasured=true;log('217床床邊血糖','取得當下血糖 68 mg/dL，需處置與複測');}
-   drawPanel();render();return;
- }
- if(a==='actGlu'){if(!s.bloodMeasured)return;panelClose();page('glucose');return;}
- if(a==='tab'){ehrTab=v;drawPanel();render();return;}
- if(a==='ivEarly'){earlyIvAction(v);return;}
- if(a==='goto'){
-   if(s.bloodMeasured&&!s.glucoseHandled&&panelKind==='bed217'){s.bloodDetour=true;log('優先順序延遲','低血糖未處置前離開床旁查閱其他資料');}
-   if(v==='bed217'){moveFromEarly219();return;}
-   if(v==='bed219'){openPanel('bed219initial');return;}
-   panelClose();
-   if(v==='cart'){openPanel('cart');return;}
-   spot(v);return;
- }
-}
-function spot(where){
- if(where==='bed217'&&s.phase==='brief'&&s.ivInitial.visited&&!s.ivInitial.complete){
-   pos('bed219');openPanel('bed219initial');
-   moveFromEarly219();
-   return;
- }
- pos(where);
- if(where==='bed217'){
-   if(s.phase==='brief'){page('assessment');openPanel('bed217');return}
-   if(s.phase==='assessment'){openPanel('bed217');return}
-   if(s.phase==='meds'||s.phase==='follow'){render();return}
-   openPanel('bed217');return;
- }
- if(where==='bed219'){
-   if(s.phase==='brief'||s.phase==='assessment'){
-     s.ivInitial.visited=true;log('選擇初始照護床位','前往219床查看輸液');
-     openPanel('bed219initial');return;
-   }
-   if(s.phase==='call'){award('interrupt',s.handoff?2:1,'處理跨床呼叫',s.handoff?'完成217床追蹤確認後前往219':'直接前往219床');page('iv');return}
-   if(s.phase==='iv'){render();return}
-   toast('219 床目前沒有新呼叫。');return;
- }
- if(where==='desk'){openPanel('desk',s.phase==='culture'?'orders':'vital');return}
- if(where==='med'){if(s.phase==='aseptic'){render();return}toast('治療室目前沒有需要配製的藥物。');return}
-}
-$('enterGame').addEventListener('click',()=>showGame(false));$('enterGame2').addEventListener('click',()=>showGame(false));$('backHome').addEventListener('click',showHome);$('scene').addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(b&&!b.disabled)act(b.dataset.action)});$('ward').addEventListener('click',e=>{const b=e.target.closest('[data-spot]');if(b)spot(b.dataset.spot)});$('cart').addEventListener('click',()=>openPanel('cart'));$('closePanel').addEventListener('click',panelClose);$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))panelClose()});$('panelBody').addEventListener('click',e=>{const b=e.target.closest('[data-panel-action]');if(b)panelAct(b.dataset.panelAction)});document.addEventListener('keydown',e=>{if(e.key==='Escape')panelClose()});
-})();
-
-</script>
+<script src="game-v6.js" defer></script>
 </body>
 </html>
