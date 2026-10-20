@@ -104,6 +104,42 @@
 .dialogue{line-height:1.8}
 .interaction-note{font-size:12px;color:#b5d7d3;margin:9px 0}
 @media(max-width:650px){.ward .cart{transform:translate(-50%,-50%) scale(.85)}}
+
+/* Two upper beds, one lower bed; medication preparation is accessed through nursing station */
+.ward .room-left,.ward .room-right{top:2%;height:45%;width:43%;bottom:auto}
+.ward .room-left{left:3%;right:auto}
+.ward .room-right{left:auto;right:3%}
+.ward .room-third{top:auto;bottom:3%;left:auto;right:3%;width:44%;height:37%;border-top:8px solid #738e96}
+.ward .zone-nurse{left:3%;bottom:3%;width:44%;height:37%}
+.ward .spot217{left:5%;top:38%;bottom:auto;right:auto}
+.ward .spot219{left:auto;right:5%;top:38%;bottom:auto}
+.ward .spot220{left:auto;right:5%;top:auto;bottom:5%}
+.ward .spotdesk{left:5%;bottom:5%}
+.ward .room-left:after,.ward .room-right:after{content:"";position:absolute;width:32%;height:12px;background:#d4e2df;bottom:-10px;left:35%;box-shadow:none;z-index:2}
+.ward .room-third:after,.ward .zone-nurse:after{content:"";position:absolute;width:32%;height:12px;background:#d4e2df;top:-10px;left:35%;z-index:2}
+.ward .room .room-label{font-size:clamp(13px,1.4vw,17px)}
+.ward .bed-shape{height:54%;top:23%}
+.ward .room-third .bed-shape{height:58%;top:25%}
+.ward .nurse{z-index:6;width:49px;height:92px;transition:left .3s linear,top .3s linear;filter:drop-shadow(2px 5px 3px #19364560)}
+.ward .nurse svg{width:58px;height:92px}
+.ward .cart{z-index:7}
+.panel-body .dialogue{color:#ffffff;background:#293d4b}
+.panel-body .dialogue small{color:#d9f765}
+.assessment-alert{background:#fff4db;color:#563c1c;border-left:5px solid #c1843e;padding:17px 20px;font-size:17px;line-height:1.75}
+.assessment-alert strong{color:#643b10;display:block;font-size:19px}
+.assessment-alert p{margin:9px 0}
+.thought-bubble{background:#edf6f4;color:#203f4a;border-left:4px solid #6e9da7;padding:14px 18px;margin:12px 0;line-height:1.75;font-size:16px}
+.thought-bubble b{color:#245b6c;font-size:14px}
+.thought-bubble p{margin:8px 0;color:#213c49}
+.console-head .sub:empty{display:none}
+@media(max-width:650px){
+  .ward{min-height:345px}
+  .ward .room-left,.ward .room-right{height:46%}
+  .ward .room-third,.ward .zone-nurse{height:36%}
+  .ward .nurse{transform:translate(-50%,-55%) scale(.8);transform-origin:center center}
+  .ward .cart{transform:translate(-50%,-55%) scale(.78)}
+  .assessment-alert{font-size:16px;padding:15px}
+}
 </style>
 </head>
 <body>
@@ -113,7 +149,7 @@
 </div>
 <div class="game hidden" id="game">
 <div class="gamebar"><button class="back" id="backHome">← 回平台首頁</button><button class="back" id="restartWard" type="button" title="清除本次試玩進度，從接班開始">重新試玩</button><span class="gamebrand">NURSESTART <span style="color:var(--lime)">LAB.</span></span><div class="gamestatus"><span id="clock">09:00</span></div></div>
-<div class="game-layout"><section class="ward-wrap"><div class="ward" id="ward"><div class="room room-left"><span class="room-label">217 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket"></div></div><div class="ivstand"></div></div><div class="room room-right"><span class="room-label">219 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#a2c5a7"></div></div><div class="ivstand"></div></div><div class="room room-third"><span class="room-label">220 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#e3d2ab"></div></div></div><div class="zone zone-nurse"><span class="zone-label">護理站 / 電腦</span><div class="monitor"></div></div><div class="zone zone-med"><span class="zone-label">治療室 / 配藥</span><div class="vial"></div></div><div class="nurse" id="nurse" style="left:50%;top:54%" aria-label="褲裝女性護理師">
+<div class="game-layout"><section class="ward-wrap"><div class="ward" id="ward"><div class="room room-left"><span class="room-label">217 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket"></div></div><div class="ivstand"></div></div><div class="room room-right"><span class="room-label">219 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#a2c5a7"></div></div><div class="ivstand"></div></div><div class="room room-third"><span class="room-label">220 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#e3d2ab"></div></div></div><div class="zone zone-nurse"><span class="zone-label">護理站 / 電腦</span><div class="monitor"></div></div><div class="nurse" id="nurse" style="left:50%;top:54%" aria-label="褲裝女性護理師">
 <svg viewBox="0 0 58 90" width="58" height="90" role="img" aria-label="穿著藍色背心與長褲的女護理師">
 <ellipse cx="30" cy="86" rx="19" ry="4" fill="#18333c" opacity=".25"/>
 <path d="M23 50 L22 78 L31 78 L32 55 L35 78 L44 78 L40 50Z" fill="#305779" stroke="#23435f" stroke-width="2"/>
@@ -132,7 +168,7 @@
 <rect x="37" y="34" width="7" height="9" fill="#fff" stroke="#54778a"/><path d="M40.5 36 v5 M38 38.5 h5" stroke="#6eaaab" stroke-width="1.3"/>
 </svg></div>
 <button class="cart" id="cart" type="button" title="開啟護理工作車：查看此床醫囑" aria-label="開啟護理工作車" style="left:57%;top:54%">
-<span class="cart-screen">工作車</span><span class="cart-top"></span><span class="cart-mid"></span><span class="cart-leg"></span><span class="wheel one"></span><span class="wheel two"></span></button><button class="clickspot spot217" data-spot="bed217">去 217 床</button><button class="clickspot spot219" data-spot="bed219">去 219 床</button><button class="clickspot spot220" data-spot="bed220">去 220 床</button><button class="clickspot spotdesk" data-spot="desk">查閱資料</button><button class="clickspot spotmed" data-spot="med">治療室</button><div class="bell hidden" id="bell">🔔 219 床按鈴</div></div></section><section class="console" aria-live="polite"><div class="console-head"><h2 id="ctitle">接班開始</h2><p class="sub" id="csub"></p></div><div class="console-body" id="scene"></div></section></div>
+<span class="cart-screen">工作車</span><span class="cart-top"></span><span class="cart-mid"></span><span class="cart-leg"></span><span class="wheel one"></span><span class="wheel two"></span></button><button class="clickspot spot217" data-spot="bed217">去 217 床</button><button class="clickspot spot219" data-spot="bed219">去 219 床</button><button class="clickspot spot220" data-spot="bed220">去 220 床</button><button class="clickspot spotdesk" data-spot="desk">查閱資料</button><div class="bell hidden" id="bell">🔔 219 床按鈴</div></div></section><section class="console" aria-live="polite"><div class="console-head"><h2 id="ctitle">接班開始</h2><p class="sub" id="csub"></p></div><div class="console-body" id="scene"></div></section></div>
 </div>
 <div class="toast hidden" id="toast" role="status"></div><div class="overlay hidden" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panelTitle"><div class="panel"><div class="panel-top"><h2 id="panelTitle"></h2><button type="button" id="closePanel" aria-label="關閉視窗">✕</button></div><div class="panel-body" id="panelBody"></div></div></div>
 <script src="game-v6.js?v=20261021-4" defer></script>
