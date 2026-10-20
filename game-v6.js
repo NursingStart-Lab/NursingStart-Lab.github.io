@@ -125,49 +125,64 @@ function render217(){
 }
 function render219(){
  const v=s.b219;v.visited=true;
- header("219 床｜周邊靜脈輸液","一般重力滴注；護理師推工作車，無輸液幫浦及特殊雙人核對關卡");
- let h=box("219 床病人",v.line||(s.bellHandled?"護理師，早安，可以幫我看看點滴嗎？":"護理師，早安。"));
+ header("219 床｜一般點滴照護","依觀察及病人反應逐步評估。");
+ let line=v.line||"護理師，早安。",a=[];
  if(v.injury&&!v.injuryFollow){
-  h+=box("稍後的病況變化","原穿刺處周圍紅斑擴大、局部溫度升高並出現壓痛，病人表示手越來越痛。疑似靜脈炎進展。");
-  h+=choices(btn("停止使用原通路，移除留置針，評估、照護及通報","219:injuryFollow"),btn("依舊覺得還可以滴，繼續使用","219:ignoreAgain"));return h;
+  line="護理師，我的手越來越痛。";
+  return box("219 床病人",line)+noteBox("入針處紅斑擴大、局部溫度升高並出現壓痛；需評估疑似靜脈炎。")+
+    choices(btn("停止使用原通路，依規範移除並執行照護","219:injuryFollow"));
  }
- let q=[];
- if(v.painPrompted&&!v.site&&!v.line.includes("我的手有點痛"))h+=box("病人補充","護理師，我的手有點痛，可以幫我看一下嗎？");
- if(!v.site)q.push(btn("觀察留置針周圍皮膚與敷料，評估局部溫度及壓痛","219:site"));
- if(!v.asked)q.push(btn("「點滴打的地方會刺痛、灼熱或不舒服嗎？」","219:ask"));
- if(v.site&&!v.decision){
-  h+=noteBox('<b>護理師內心 OS</b>「入針處周邊紅紅的，雖然病人沒有喊痛，會不會是靜脈炎的早期徵象？」');
-  q.push(btn("停止使用異常通路，評估後依規範移除留置針並安排後續輸液","219:replace"));
-  q.push(btn("沒有喊痛，點滴還在滴，暫時繼續使用","219:ignore"));
- }
- if(v.painPrompted&&!v.decision&&!v.site)q.push(btn("點滴還能滴，晚點再處理","219:ignore"));
- if(v.ratePrompted&&!v.rate&&!v.line.includes("比昨天快"))h+=box("病人問","護理師，現在點滴滴得好像比昨天快，這樣正常嗎？");
- if(!v.rate&&!v.lineRemoved)q.push(btn("打開工作車，核對 219 床輸液醫囑與實際滴速","modal:cart"));
- if(v.lineRemoved)h+=noteBox("原有疑慮的留置針已停止使用；目前不可當成仍有正常輸液滴速。");
- if(v.decision==="ignore"&&!v.injury)q.push(btn("重新評估後決定立即停止輸液及移除有疑慮的留置針","219:injuryFollow"));
- if(v.lineRemoved&&!v.aftercare)q.push(btn("完成穿刺處照護，依有效醫囑安排並確認新輸液通路","219:aftercare"));
- if(v.injuryFollow)h+=noteBox("已補救疑似靜脈炎，首次選擇仍保留 0 分；後續仍需追蹤局部狀況。");
- if(v.decision==="replace"&&v.aftercare)h+=noteBox("原異常通路已停止並移除，後續輸液依照安排進行。");
- q.push(btn("先去其他床位（可稍後返回）","go:bed217"));
- h+=choices(...q);return h;
+ const f=v.focus||"start";
+ if(f==="start"){
+  line="護理師，早安。";
+  a=[btn("詢問點滴部位是否疼痛或不舒服","219:ask"),btn("主動檢查留置針部位與敷料","219:site")];
+ }else if(f==="ask")a=[btn("檢視穿刺處、皮膚與敷料","219:site")];
+ else if(f==="site"){
+  line="留置針入針處局部泛紅，敷料完整；病人沒有明顯壓痛。";
+  a=[btn("評估後停止使用異常通路，依規範處理","219:replace"),
+     btn("病人沒喊痛、點滴還能滴，暫時繼續使用","219:ignore")];
+ }else if(f==="replace"||f==="injuryFollow"){
+  line="已停止使用原通路，需要完成穿刺處照護與後續輸液安排。";
+  a=[btn("處理穿刺處並安排新輸液通路","219:aftercare")];
+ }else if(f==="aftercare"||f==="ratePrompted"){
+  line=v.ratePrompted&&!v.rate?"護理師，現在點滴滴得好像比昨天快，這樣正常嗎？":"目前已安排後續輸液。";
+  a=!v.rate?[btn("開啟工作車，核對有效醫囑與滴速","modal:cart")]:[btn("前往其他病床","go:bed217")];
+ }else if(f==="rate"){
+  line="已核對目前有效輸液醫囑與實際滴速。";
+  a=[btn("接續其他病床照護","go:bed217")];
+ }else if(f==="painPrompted"){
+  line="護理師，我的手有點痛，可以幫我看一下嗎？";
+  a=[btn("評估留置針入針處周圍","219:site"),btn("點滴還能滴，晚點再處理","219:ignore")];
+ }else if(f==="ignored"){
+  a=[btn("返回評估並停止有疑慮通路","219:injuryFollow")];
+ }else if(!v.site)a=[btn("檢查留置針部位","219:site")];
+ if(v.ratePrompted&&!v.rate&&f!=="ratePrompted"&&f!=="painPrompted"&&!v.lineRemoved&&a.length<2)
+  a.push(btn("打開工作車核對滴速","modal:cart"));
+ return box("219 床病人",line)+(a.length?choices(...a):"");
 }
 function render220(){
  const v=s.b220;v.visited=true;
- header("220 床｜中風後左肩疼痛","左側偏癱復健病人｜先評估疼痛與患側保護，再進行通報");
- let h=box("220 床病人",v.line||"護理師，我左邊肩膀有點痛。");
- let q=[];
- if(!v.onset)q.push(btn("「肩膀什麼時候開始痛？以前有發生過嗎？」","220:onset"));
- if(!v.score)q.push(btn("「現在大概痛幾分？是痠、悶還是刺痛？」","220:score"));
- if(!v.triggers)q.push(btn("「什麼時候會更痛？休息或靠著枕頭會好一點嗎？」","220:triggers"));
- if(!v.arm)q.push(btn("「中風後左手平常有力氣嗎？坐起來或移位時怎麼放？」","220:arm"));
- if(v.arm&&v.triggers&&!v.exam)q.push(btn("觀察患側上肢支托、肩部姿勢與相關徵象","220:exam"));
- if(v.arm&&v.triggers)h+=noteBox('<b>護理師內心 OS</b>「左上肢無力，沒有適當支托，可能因牽拉增加肩部疼痛或半脫位風險；需要檢查，不應直接確診。」');
- if(v.exam&&!v.positioned)q.push(btn("協助患側上肢適當支托與擺位，並向病人衛教","220:position"));
- if(!v.acetViewed)q.push(btn("查閱 220 床 Acetaminophen 醫囑與用藥紀錄","220:acet"));
- if(!v.report)q.push(btn("打電話向林醫師報告左肩疼痛","doc:shoulder"));
- if(v.report&&!v.follow)q.push(btn("返回評估疼痛與患側姿勢、完成追蹤紀錄","220:follow"));
- q.push(btn("手推工作車｜220 床 MAR","modal:cart"));
- h+=choices(...q);return h;
+ header("220 床｜中風後左肩疼痛","依病人每次回答決定下一步，不直接確診肩關節半脫位。");
+ let line=v.line||"護理師，我左邊肩膀有點痛。",a=[],f=v.focus||"start";
+ if(f==="start"){
+  line="護理師，我左邊肩膀有點痛。";
+  a=[btn("「肩膀什麼時候開始痛？以前會這樣嗎？」","220:onset"),
+     btn("只問了哪裡痛，就先向林醫師報告","doc:shoulder")];
+ }else if(f==="onset")a=[btn("「痛起來是什麼感覺？現在大約幾分？」","220:score")];
+ else if(f==="score")a=[btn("「哪個時候會更痛？靠著枕頭或休息會好一點嗎？」","220:triggers")];
+ else if(f==="triggers")a=[btn("「中風後左手有力氣嗎？坐起來時怎麼放？」","220:arm")];
+ else if(f==="arm")a=[btn("檢視患側上肢姿勢、肩部及支托情形","220:exam")];
+ else if(f==="exam"){
+  line="客觀觀察：左上肢無力，坐姿時缺少適當支托；可能有肩部牽拉風險。";
+  a=[btn("協助患側適當支托及擺位，並執行衛教","220:position")];
+ }else if(f==="position")a=[btn("核對 Acetaminophen 與 Norvasc 醫囑","220:acet")];
+ else if(f==="acet")a=[btn("向林醫師完整報告疼痛及藥膏需求","doc:shoulder")];
+ else if(f==="reported")a=[btn("追蹤疼痛及患側擺位","220:follow")];
+ else if(f==="follow")a=[btn("檢視完成的評估與分數","end:review")];
+ let content=box(f==="exam"?"肩部與患側肢體評估":"220 床病人",line);
+ if(f==="arm"||f==="exam")
+  content+=noteBox('<b>護理師內心 OS</b>「患側沒有支托，肩膀可能受到牽拉，會不會增加疼痛或半脫位風險？還需要進一步評估。」');
+ return content+(a.length?choices(...a):"");
 }
 function renderDesk(){
  header("護理站｜查閱資料與工作待辦","資料需要由學員主動打開，不會把病人的隱藏線索直接放在主畫面");
