@@ -110,7 +110,7 @@ function renderStart(){
 }
 function render217(){
  const v=s.b217;
- header("217 床｜臨床評估與給藥","依病人回答逐步判斷；每次只有一項合宜處置與一項不適當選擇。");
+ header("217 床｜臨床評估與給藥","");
  let focus=v.focus||"start",line=v.line||"護理師，我覺得不太舒服，昨天沒有這樣。",a=[];
  const pair=(correct,good,wrong,bad,wrongFirst=false)=>wrongFirst?[btn(bad,wrong),btn(good,correct)]:[btn(good,correct),btn(bad,wrong)];
  if(focus==="start"){
@@ -191,7 +191,7 @@ function render217(){
 }
 function render219(){
  const v=s.b219;v.visited=true;
- header("219 床｜一般點滴照護","依觀察及病人反應逐步評估。");
+ header("219 床｜點滴照護","");
  let line=v.line||"護理師，早安。",a=[];
  if(v.injury&&!v.injuryFollow){
   line="護理師，我的手越來越痛。";
@@ -228,7 +228,7 @@ function render219(){
 }
 function render220(){
  const v=s.b220;v.visited=true;
- header("220 床｜中風後左肩疼痛","依病人每次回答決定下一步，不直接確診肩關節半脫位。");
+ header("220 床｜左肩疼痛","");
  let line=v.line||"護理師，我左邊肩膀有點痛。",a=[],f=v.focus||"start";
  if(f==="start"){
   line="護理師，我左邊肩膀有點痛。";
@@ -247,7 +247,7 @@ function render220(){
  else if(f==="follow")a=[btn("檢視完成的評估與分數","end:review")];
  let content=box(f==="exam"?"肩部與患側肢體評估":"220 床病人",line);
  if(f==="arm"||f==="exam")
-  content+=noteBox('<b>護理師內心 OS</b>「患側沒有支托，肩膀可能受到牽拉，會不會增加疼痛或半脫位風險？還需要進一步評估。」');
+  content+='<div class="thought-bubble"><b>護理師內心 OS</b><p>「患側沒有支托，肩膀可能受到牽拉，會不會增加疼痛或半脫位風險？還需要進一步評估。」</p></div>';
  return content+(a.length?choices(...a):"");
 }
 function renderDesk(){
@@ -262,7 +262,7 @@ function renderDesk(){
 }
 function renderMed(){
  const a=s.abx;
- header("治療室｜新醫囑無菌配藥","先完成醫囑與病人安全查證；污染時須更換器材重新準備");
+ header("新醫囑｜無菌備藥","");
  const prompts=[
  ["準備前核對","核對病人、Cefepime 醫囑、藥名、溶劑與配製要求"],
  ["無菌準備","完成手部衛生、工作區清潔與穿刺部位消毒"],
@@ -426,10 +426,9 @@ function drawModal(){
  
  }else if(modal.startsWith("need:")){
   const kind=modal.slice(5),r=doctorReport(kind);
-  title="217 床｜通報前確認";
-  html=box("護理師內心 OS","你還沒做完整評估，現在報告醫師，資訊仍不足。")+
-   noteBox("<b>尚需補充：</b>"+r.missing.join("、"))+
-   pbtn("返回病人旁，先完成評估與必要處置","close");
+  title=(kind==="shoulder"?"220 床":"217 床")+"｜評估尚未完成";
+  html='<div class="assessment-alert" role="alert"><strong>評估尚未完成，請先補充資料再向醫師通報。</strong><p>目前缺少：</p><p>'+r.missing.join("、")+"</p></div>"+
+   pbtn("返回床旁繼續評估","close");
  }else if(modal.startsWith("doc:")){
   const kind=modal.slice(4),r=doctorReport(kind);if(!r)return;
   title=r.title;
@@ -578,13 +577,14 @@ function act(token){
  if(a==="220"){do220(b);return}
  if(a==="modal"){openModal(b==="cart"?"cart":b);return}
  if(a==="doc"){
-  if(b==="glucose"||b==="aspirin"){
+  if(b==="glucose"||b==="aspirin"||b==="shoulder"){
    const r=doctorReport(b);
    if(r&&r.missing.length){
-    const v=s.b217;
+    const v=b==="shoulder"?s.b220:s.b217;
     if(b==="glucose")v.glucosePrompted=true;
-    else v.aspirPrompted=true;
-    note("217 床提早通報嘗試",b+"：評估尚未完整："+r.missing.join("、"));
+    else if(b==="aspirin")v.aspirPrompted=true;
+    else{v.prompted=true;v.firstPremature=true;}
+    note((b==="shoulder"?"220":"217")+" 床提早通報嘗試",b+"：評估尚未完整："+r.missing.join("、"));
     openModal("need:"+b);return;
    }
   }
