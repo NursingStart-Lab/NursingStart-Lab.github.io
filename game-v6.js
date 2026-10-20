@@ -46,8 +46,16 @@ function move(place){
  }
  if(s.place==="bed219"&&place!=="bed219"){
   const v=s.b219;
-  if(!v.site&&!v.painPrompted){v.painPrompted=true;note("219病人提醒","未檢查留置針，病人說左手有點痛")}
-  if(!v.rate&&!v.ratePrompted){v.ratePrompted=true;note("219病人提醒","病人詢問滴速是否比昨天快")}
+  if(!v.site&&!v.painPrompted){
+   v.painPrompted=true;v.line="護理師，我的手有點痛，可以幫我看一下嗎？";
+   note("219病人提醒","第一次準備離開時，病人反映手痛");
+   render();return;
+  }
+  if(v.site&&!v.rate&&!v.ratePrompted&&!v.lineRemoved&&v.decision){
+   v.ratePrompted=true;v.line="護理師，現在點滴滴得好像比昨天快，這樣正常嗎？";
+   note("219病人提醒","下一次準備離開時，病人才提出滴速疑問");
+   render();return;
+  }
  }
  if(s.place==="bed217"&&s.b217.bg&&!s.b217.food&&!s.b217.gPriorUnsafe)note("待追蹤","217 床低血糖尚未完成處置");
  s.place=place;tick(2);render();
