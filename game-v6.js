@@ -198,8 +198,9 @@ function render217(){
   a=[btn("回到 217 床複測血糖、追蹤症狀","217:recheck"),
      btn("沒有必要複測，直接繼續常規給藥","217:wrongRecheck")];
  }
- let h=box(focus==="feedback"?"護理師內心 OS":
-  ["objective","bg","vital"].includes(focus)?"床旁評估結果":focus==="medQuiz"?"藥物作用配對":"217 床病人",line);
+ let h=focus==="feedback"?
+  '<div class="assessment-alert" role="alert"><strong>目前判斷需要補充評估</strong><p>'+line+'</p></div>':
+  box(["objective","bg","vital"].includes(focus)?"床旁評估結果":focus==="medQuiz"?"藥物作用配對":"217 床病人",line);
  if(v.bg&&focus!=="bg"&&focus!=="start"&&focus!=="feedback")
   h+='<div class="interaction-note">已測血糖 68 mg/dL'+(v.recheck?"｜複測 "+v.recheckValue+" mg/dL":"｜需要追蹤")+"</div>";
  return h+(a.length?choices(...a):"");
