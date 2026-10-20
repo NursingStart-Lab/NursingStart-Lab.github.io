@@ -673,6 +673,7 @@ function initialize(){
  $("enterGame").addEventListener("click",start);
  $("enterGame2").addEventListener("click",start);
  $("backHome").addEventListener("click",()=>{$("home").classList.remove("hidden");$("game").classList.add("hidden")});
+ $("restartWard").addEventListener("click",()=>{if(!window.confirm||window.confirm("重新試玩將清除本次進度與分數，確定嗎？")){s=INIT();save();render()}});
  $("scene").addEventListener("click",e=>{const x=e.target.closest("[data-act]");if(x&&!x.disabled)act(x.dataset.act)});
  $("ward").addEventListener("click",e=>{const x=e.target.closest("[data-spot]");if(x)move(x.dataset.spot)});
  $("cart").addEventListener("click",()=>openModal("cart"));
