@@ -297,7 +297,7 @@ function doctorReport(kind){
   "病人昨晚排便一次，主訴顏色偏深。"+(g.stoolDetail?"進一步詢問表示偏黑、較黏，便量不確定。":""),
   g.bruise?"觀察手臂有瘀青，尚需持續追蹤其他出血徵象。":"",
   g.vital?"目前血壓 126/78 mmHg、脈搏 82 次／分，無法僅憑當下生命徵象排除出血。":"",
-  g.aspReview?"目前有 Aspirin 醫囑，給藥前正在釐清疑似出血風險。":"",
+  g.aspReview?"目前有 Aspirin 1 cap PO QD 醫囑，給藥前正在釐清疑似出血風險。":"",
   "請問 Aspirin 本次給藥及後續檢查，有要再開立什麼處置嗎？"].filter(Boolean);
   return {title:"217 床｜Aspirin 疑似出血風險通報",doctor:"陳醫師",missing,lines,
    reply:missing.length?"目前血壓、脈搏如何？便色與次數確認了嗎？Aspirin 的給藥紀錄呢？請先把評估補齊。":"了解，先不要自行判定是出血；我會評估本次 Aspirin 給藥及是否需要安排檢查，請持續觀察並依新醫囑執行。"};
