@@ -140,6 +140,10 @@
   .ward .cart{transform:translate(-50%,-55%) scale(.78)}
   .assessment-alert{font-size:16px;padding:15px}
 }
+
+.ward .nurse{width:54px;height:94px}
+.ward .nurse svg{width:61px;height:98px}
+@media(max-width:650px){.ward .nurse svg{width:57px;height:92px}}
 </style>
 </head>
 <body>
@@ -149,23 +153,32 @@
 </div>
 <div class="game hidden" id="game">
 <div class="gamebar"><button class="back" id="backHome">← 回平台首頁</button><button class="back" id="restartWard" type="button" title="清除本次試玩進度，從接班開始">重新試玩</button><span class="gamebrand">NURSESTART <span style="color:var(--lime)">LAB.</span></span><div class="gamestatus"><span id="clock">09:00</span></div></div>
-<div class="game-layout"><section class="ward-wrap"><div class="ward" id="ward"><div class="room room-left"><span class="room-label">217 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket"></div></div><div class="ivstand"></div></div><div class="room room-right"><span class="room-label">219 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#a2c5a7"></div></div><div class="ivstand"></div></div><div class="room room-third"><span class="room-label">220 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#e3d2ab"></div></div></div><div class="zone zone-nurse"><span class="zone-label">護理站 / 電腦</span><div class="monitor"></div></div><div class="nurse" id="nurse" style="left:50%;top:54%" aria-label="褲裝女性護理師">
-<svg viewBox="0 0 58 90" width="58" height="90" role="img" aria-label="穿著藍色背心與長褲的女護理師">
-<ellipse cx="30" cy="86" rx="19" ry="4" fill="#18333c" opacity=".25"/>
-<path d="M23 50 L22 78 L31 78 L32 55 L35 78 L44 78 L40 50Z" fill="#305779" stroke="#23435f" stroke-width="2"/>
-<path d="M20 78 h13 v6 h-15 z M34 78 h13 v6 h-13z" fill="#29373e"/>
-<path d="M14 30 Q29 22 44 30 L45 55 L13 55 Z" fill="#e8f1f2" stroke="#244f63" stroke-width="2"/>
-<path d="M15 30 L24 28 L27 52 L15 52Z M34 28 L44 31 L44 52 L31 52Z" fill="#5f91b1"/>
-<path d="M27 31 L32 31 L33 52 L26 52 Z" fill="#f8faf4"/>
-<path d="M24 29 L24 18 L35 18 L35 29Z" fill="#ecc3a5"/>
-<path d="M16 34 L11 49 L15 56 L20 53 L20 48 L22 34 Z M42 34 L48 49 L44 56 L39 53 L38 47 L36 34Z" fill="#ecc3a5"/>
-<circle cx="29" cy="15" r="14" fill="#40312f"/>
-<path d="M39 11 Q54 13 51 26 Q44 27 41 19Z" fill="#40312f"/>
-<ellipse cx="29" cy="17" rx="11" ry="12" fill="#ecc3a5"/>
-<path d="M18 14 Q16 1 30 2 Q44 3 41 15 L36 12 L25 10 L18 17Z" fill="#40312f"/>
-<circle cx="25" cy="18" r="1.3" fill="#42302c"/><circle cx="33" cy="18" r="1.3" fill="#42302c"/>
-<path d="M26 23 Q29 25 32 23" fill="none" stroke="#955d53" stroke-width="1.3"/>
-<rect x="37" y="34" width="7" height="9" fill="#fff" stroke="#54778a"/><path d="M40.5 36 v5 M38 38.5 h5" stroke="#6eaaab" stroke-width="1.3"/>
+<div class="game-layout"><section class="ward-wrap"><div class="ward" id="ward"><div class="room room-left"><span class="room-label">217 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket"></div></div><div class="ivstand"></div></div><div class="room room-right"><span class="room-label">219 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#a2c5a7"></div></div><div class="ivstand"></div></div><div class="room room-third"><span class="room-label">220 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#e3d2ab"></div></div></div><div class="zone zone-nurse"><span class="zone-label">護理站 / 電腦</span><div class="monitor"></div></div><div class="nurse" id="nurse" style="left:50%;top:53%" aria-label="穿著藍色背心、白色制服與長褲的女性護理師">
+<svg viewBox="0 0 72 116" width="72" height="116" role="img" aria-label="有護理識別證、藍色背心及長褲的年輕女護理師">
+<ellipse cx="37" cy="110" rx="25" ry="4" fill="#203c43" opacity=".24"/>
+<path d="M23 65L22 102L34 102L35 76L40 102L52 102L49 65Z" fill="#274f71" stroke="#24455a" stroke-width="2"/>
+<path d="M21 101H35L36 109H19Z M40 101H53L55 109H39Z" fill="#eef3ec" stroke="#345263" stroke-width="2"/>
+<path d="M21 43L13 70L18 76L25 69L31 51Z" fill="#e9bca0" stroke="#8b6c5d"/>
+<path d="M50 43L61 68L56 75L47 67L42 52Z" fill="#e9bca0" stroke="#8b6c5d"/>
+<path d="M20 41Q35 34 52 41L56 76H18Z" fill="#f9fcf8" stroke="#557283" stroke-width="2"/>
+<path d="M20 41L29 38L34 71L18 75Z M43 38L53 42L56 75L39 71Z" fill="#5e91b4" stroke="#356582" stroke-width="1.5"/>
+<path d="M29 40L35 48L42 40L39 37H32Z" fill="#ffffff" stroke="#b4c8c9"/>
+<path d="M28 41Q33 47 30 54Q29 59 33 62 M44 41Q39 47 42 54Q42 59 38 62" fill="none" stroke="#254f60" stroke-width="1.8"/>
+<circle cx="36" cy="63" r="3.6" fill="#a9c5ce" stroke="#355b6b" stroke-width="1.8"/>
+<path d="M31 36V42Q36 48 42 41V35" fill="#edbfa5" stroke="#b5856f"/>
+<path d="M49 15Q66 22 62 43Q55 43 51 36Z" fill="#47332f"/>
+<ellipse cx="35" cy="22" rx="16" ry="19" fill="#47332f"/>
+<ellipse cx="36" cy="25" rx="13" ry="16" fill="#f2c5a9"/>
+<path d="M22 21Q20 7 33 5Q50 4 51 21Q43 15 37 14Q31 21 23 20Z" fill="#47332f"/>
+<path d="M48 14Q58 19 54 31L48 34Z" fill="#47332f"/>
+<circle cx="31" cy="25" r="1.4" fill="#493c3a"/><circle cx="41" cy="25" r="1.4" fill="#493c3a"/>
+<path d="M32 33Q36 36 40 33" fill="none" stroke="#a66d69" stroke-width="1.4" stroke-linecap="round"/>
+<rect x="43" y="45" width="11" height="13" rx="1.5" fill="#ffffff" stroke="#345c75" stroke-width="1.2"/>
+<path d="M48.5 47V53M45.5 50H51.5" stroke="#437e84" stroke-width="1.5"/>
+<text x="48.5" y="57" text-anchor="middle" fill="#2b5361" font-size="4" font-weight="bold">護理</text>
+<path d="M16 62L7 63V83L22 80L22 63Z" fill="#e4edf0" stroke="#496775" stroke-width="2"/>
+<path d="M12 67H19M12 72H19M12 77H17" stroke="#78969e" stroke-width="1.2"/>
+<path d="M16 74Q17 75 19 76" stroke="#e9bca0" stroke-width="4" stroke-linecap="round"/>
 </svg></div>
 <button class="cart" id="cart" type="button" title="開啟護理工作車：查看此床醫囑" aria-label="開啟護理工作車" style="left:57%;top:54%">
 <span class="cart-screen">工作車</span><span class="cart-top"></span><span class="cart-mid"></span><span class="cart-leg"></span><span class="wheel one"></span><span class="wheel two"></span></button><button class="clickspot spot217" data-spot="bed217">去 217 床</button><button class="clickspot spot219" data-spot="bed219">去 219 床</button><button class="clickspot spot220" data-spot="bed220">去 220 床</button><button class="clickspot spotdesk" data-spot="desk">查閱資料</button><div class="bell hidden" id="bell">🔔 219 床按鈴</div></div></section><section class="console" aria-live="polite"><div class="console-head"><h2 id="ctitle">接班開始</h2><p class="sub" id="csub"></p></div><div class="console-body" id="scene"></div></section></div>
