@@ -144,11 +144,38 @@
 .ward .nurse{width:54px;height:94px}
 .ward .nurse svg{width:61px;height:98px}
 @media(max-width:650px){.ward .nurse svg{width:57px;height:92px}}
+
+.identity-intake{background:#fff9ef;border:1px solid #d6d8d0;border-left:5px solid #477a89;padding:18px 20px;margin:22px 0 18px;max-width:710px;color:#203845}
+.identity-intake-title{font-weight:850;font-size:17px;margin-bottom:12px}
+.identity-intake-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.identity-intake label{font-size:14px;font-weight:750;display:flex;flex-direction:column;gap:7px}
+.identity-intake input,.submit-identity input,.submit-identity select{width:100%;padding:11px 13px;border:1px solid #93a5ae;border-radius:4px;font-size:16px;background:#fff;color:#132b36;outline-offset:2px}
+.identity-intake small{display:block;line-height:1.7;margin-top:9px;color:#536674}
+.identity-intake-error{color:#9e2c27;font-weight:700;margin-top:8px}
+.identity-intake-error:empty{display:none}
+.submit-identity{margin:20px 0;border:1px solid #637d8d;background:#203c4b;padding:17px 18px}
+.submit-identity h3{font-size:19px;margin:0 0 10px;color:#f0f7f8}
+.submit-identity-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+.submit-identity label{font-size:13px;color:#e1f3f4;display:flex;flex-direction:column;gap:7px;font-weight:750}
+.submit-identity .choice{margin-top:12px;width:100%;border:2px solid #def66b;color:#132a35;background:#def66b;font-weight:850;text-align:center}
+.submit-identity small{display:block;line-height:1.65;color:#d7e3e7;margin-top:11px}
+.submit-state{margin-top:12px;background:#edf4ec;color:#193f34;border-left:4px solid #6f9a7b;padding:12px 14px;line-height:1.75;font-size:14px}
+.submit-state.warning{background:#fff4de;color:#643d1e;border-color:#c39b47}
+@media(max-width:650px){.identity-intake-fields,.submit-identity-grid{grid-template-columns:1fr}.identity-intake{padding:14px;margin:14px 0}.submit-identity{padding:13px}}
 </style>
 </head>
 <body>
 <div id="home">
-<header class="mast"><div class="shell"><div class="topbar"><div class="brand">NURSESTART<span> LAB.</span></div><span class="brand-type">新進護理師學習基地</span></div><div class="hero"><h1>不是只會給藥。<br><em>而是懂得判斷。</em></h1><p class="lead">走進病房，從病人的話、護理紀錄與醫囑中，做出自己的判斷。</p><div class="hero-actions"><button class="btn btn-primary" id="enterGame">開始病房任務 →</button><a class="btn btn-secondary" href="https://linexepa.github.io/EPA-MAKAR-PRETEST/" target="_blank" rel="noopener">開啟原本排序前測 ↗</a></div></div></div></header>
+<header class="mast"><div class="shell"><div class="topbar"><div class="brand">NURSESTART<span> LAB.</span></div><span class="brand-type">新進護理師學習基地</span></div><div class="hero"><h1>不是只會給藥。<br><em>而是懂得判斷。</em></h1><p class="lead">走進病房，從病人的話、護理紀錄與醫囑中，做出自己的判斷。</p><div class="identity-intake" id="identityIntake">
+  <div class="identity-intake-title">進入病房前，請填寫學員資料</div>
+  <div class="identity-intake-fields">
+    <label for="startFullName">姓名 <input id="startFullName" type="text" maxlength="40" autocomplete="name" placeholder="請輸入姓名" required></label>
+    <label for="startUnit">單位 <input id="startUnit" type="text" maxlength="60" autocomplete="organization" placeholder="例如：10A、復健科病房" required></label>
+  </div>
+  <div class="identity-intake-error" id="startIdentityError" role="alert" aria-live="polite"></div>
+  <small>姓名及單位用於教師後台比對成績；同一台共用裝置請在試玩後清除進度。</small>
+</div>
+<div class="hero-actions"><button class="btn btn-primary" id="enterGame">開始病房任務 →</button><a class="btn btn-secondary" href="https://linexepa.github.io/EPA-MAKAR-PRETEST/" target="_blank" rel="noopener">開啟原本排序前測 ↗</a></div></div></div></header>
 <main class="shell"><div class="section-title"><h2>一堂課，三個時刻。</h2></div><section class="home-info" aria-label="教學流程"><div class="info"><h3>先排序，不公布答案</h3><p>記錄你第一時間的臨床判斷。</p></div><div class="info"><h3>觀看 MAKAR 教學</h3><p>透過 MAKAR 學習給藥安全。</p></div><div class="info"><h3>回到病房實際判斷</h3><p>前往病床、查閱紀錄、回應呼叫鈴。</p></div></section><section class="course-banner"><div><strong>第一個任務｜09:00 給藥前的五分鐘</strong><p>完成你的第一次病房給藥安全任務。</p></div><button class="btn btn-dark" id="enterGame2">進入試玩 →</button></section><footer class="page-foot">© NurseStart Lab　｜　臨床教學練習｜不含真實病人個資｜非正式臨床決策或 EPA 評定工具。</footer></main>
 </div>
 <div class="game hidden" id="game">
@@ -184,6 +211,6 @@
 <span class="cart-screen">工作車</span><span class="cart-top"></span><span class="cart-mid"></span><span class="cart-leg"></span><span class="wheel one"></span><span class="wheel two"></span></button><button class="clickspot spot217" data-spot="bed217">去 217 床</button><button class="clickspot spot219" data-spot="bed219">去 219 床</button><button class="clickspot spot220" data-spot="bed220">去 220 床</button><button class="clickspot spotdesk" data-spot="desk">查閱資料</button><div class="bell hidden" id="bell">🔔 219 床按鈴</div></div></section><section class="console" aria-live="polite"><div class="console-head"><h2 id="ctitle">接班開始</h2><p class="sub" id="csub"></p></div><div class="console-body" id="scene"></div></section></div>
 </div>
 <div class="toast hidden" id="toast" role="status"></div><div class="overlay hidden" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panelTitle"><div class="panel"><div class="panel-top"><h2 id="panelTitle"></h2><button type="button" id="closePanel" aria-label="關閉視窗">✕</button></div><div class="panel-body" id="panelBody"></div></div></div>
-<script src="game-v6.js?v=20261021-5" defer></script>
+<script src="game-v6.js?v=20261021-6" defer></script>
 </body>
 </html>
