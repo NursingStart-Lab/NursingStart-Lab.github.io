@@ -455,6 +455,9 @@ function render(){
  $("scene").innerHTML=html;refreshWardMap();save();
 }
 function openModal(kind){
+ if(s.place==="bed217"&&["handoff217","ehr217","leaflet"].includes(kind)){
+  note("217資料查閱",kind==="handoff217"?"查看交班":kind==="ehr217"?"查看電子病歷與醫囑":"查看藥物仿單");
+ }
  modal=kind;$("overlay").classList.remove("hidden");
  drawModal();
 }
@@ -541,6 +544,12 @@ function drawModal(){
     pbtn("查閱 Aspirin 藥物作用與仿單","quiz:openLeaflet");
   }
  
+ }else if(modal==="handoff217"){
+ title="217 床｜交班內容";
+ html='<div class="record-head">217 床｜本班照護資訊</div>'+
+ '<div class="panel-answer"><b>病人背景：</b>腦中風後住院接受復健照護，目前沒有吞嚥障礙問題。</div>'+
+ '<div class="panel-answer"><b>本班事項：</b>上午需核對常規醫囑與病人當下狀況，依評估結果執行給藥安全查核。</div>'+
+ '<p class="panel-info">交班內容僅包含前一班已知事項。當下新出現的症狀，仍需要你到床旁詢問及評估。</p>';
  }else if(modal==="ehr217"){
  title="217 床｜電子病歷";
  html='<div class="record-head">血糖紀錄</div><table class="record">'+
