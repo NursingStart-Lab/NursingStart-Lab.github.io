@@ -2,6 +2,7 @@
 "use strict";
 const $=id=>document.getElementById(id);
 const KEY="nursestart-lab-ward-v6";
+const SUBMIT_URL="https://script.google.com/macros/s/AKfycbx5VHmtqMvYc1TOy4HYlwNCJ6rlvLRDq90PYkzPZuhzpSyd4yf6U2tCcrSqCbAvkr9k/exec";
 const ITEMS=[
  ["gAssess","217｜血糖相關評估"],["gAction","217｜血糖處置與追蹤安排"],["gReport","217｜向陳醫師通報血糖"],
  ["aAssess","217｜Aspirin 出血風險評估"],["famotidine","217｜Aspirin 藥品作用查證"],["aReport","217｜向陳醫師通報疑似出血"],["med217","217｜用藥安全核對"],
@@ -11,6 +12,7 @@ const ITEMS=[
 ];
 const INIT=()=>({
  version:6,place:"start",minute:0,firstPlace:"",log:[],score:{},feedback:"",bell:false,bellHandled:false,handoff:false,
+ identity:{fullName:"",unit:"",phase:"試玩"},upload:{id:"",state:"",error:""},startedAt:0,
  b217:{intro:false,line:"",focus:"start",returnFocus:"start",lastFeedback:"",gMistakes:0,aMistakes:0,medQuiz:{index:0,firstCorrect:0,answer:"",done:false},symptom:false,onset:false,meal:false,objective:false,swallow:false,bg:false,bgMinute:0,
   food:false,glucoseReported:false,glucosePrompted:false,gPriorUnsafe:false,recheck:false,recheckValue:null,
   stool:false,stoolDetail:false,bruise:false,vital:false,aspReview:false,aspirReport:false,aspirPrompted:false,
@@ -29,6 +31,9 @@ function restore(){
   const d=JSON.parse(localStorage.getItem(KEY)||"null");
   if(d&&d.version===6&&d.b217&&d.b219&&d.b220&&d.abx&&Array.isArray(d.log)){
    const g=d.b217,i=d.b219,w=d.b220;
+   if(!d.identity)d.identity={fullName:"",unit:"",phase:"試玩"};
+   if(!d.upload)d.upload={id:"",state:"",error:""};
+   if(!Number.isFinite(d.startedAt))d.startedAt=0;
    if(!g.medQuiz)g.medQuiz={index:0,firstCorrect:0,answer:"",done:false};
    if(!Number.isFinite(g.gMistakes))g.gMistakes=0;
    if(!Number.isFinite(g.aMistakes))g.aMistakes=0;
@@ -300,10 +305,86 @@ function scoreSummary(){
  '<div class="results">'+rows+"</div>"+
  noteBox("同一評分項目只計首次決策；病人提示、再次評估、修正與補救則完整保留操作歷程。沒有接觸的項目顯示「未評估」，不等同於做錯。此為教學，不是 EPA 信賴等級。");
 }
+
+function safeHTML(value){
+ return String(value==null?"":value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function wardFinished(){
+ return !!(s.b217.visited&&s.b219.visited&&s.b220.visited&&
+   s.b217.aspirReport&&
+   ["gAction","ivDecision","shoulderReport"].every(k=>Object.prototype.hasOwnProperty.call(s.score,k)));
+}
+function submissionUI(){
+ const id=s.identity||{fullName:"",unit:"",phase:"試玩"},up=s.upload||{id:"",state:""};
+ const sent=up.state==="sent",sending=up.state==="sending";
+ const disabled=sent||sending;
+ const status=sent?"已發送至 Apps Script，請到教師試算表確認是否確實入庫。由於 Google Apps Script 跨網域限制，本頁無法直接讀取寫入成功回應。":
+  sending?"正在傳送，請稍候……":
+  up.state==="failed"?"傳送時發生連線錯誤："+safeHTML(up.error||"請檢查網路並重試"):"";
+ const phase=id.phase||"試玩";
+ const completed=wardFinished();
+ return '<div class="submit-identity"><h3>提交本次病房評量</h3>'+
+  '<div class="submit-identity-grid">'+
+  '<label for="submitFullName">姓名<input id="submitFullName" type="text" maxlength="40" value="'+safeHTML(id.fullName)+'" '+(disabled?"disabled":"")+' required></label>'+
+  '<label for="submitUnit">單位<input id="submitUnit" type="text" maxlength="60" value="'+safeHTML(id.unit)+'" '+(disabled?"disabled":"")+' required></label>'+
+  '<label for="submitPhase">評量階段<select id="submitPhase" '+(disabled?"disabled":"")+'>'+
+   ["試玩","前測","後測"].map(v=>'<option value="'+v+'" '+(v===phase?"selected":"")+'>'+v+"</option>").join("")+
+  "</select></label></div>"+
+  '<small>本次記錄狀態：'+(completed?"已完成核心任務":"仍有核心任務未完成")+'。原有評分採首次選擇，未完成項目保持「未評估」。姓名與單位只用於教師辨識，不應填入病人資料。</small>'+
+  (status?'<div role="status" class="submit-state'+(up.state==="failed"?" warning":"")+'">'+status+"</div>":"")+
+  (up.id?'<small>本次提交編號：'+safeHTML(up.id)+'</small>':"")+
+  '<button type="button" class="choice" data-act="end:submit" '+(disabled?"disabled":"")+">"+
+  (sent?"已送出":sending?"傳送中……":"送出成績與操作紀錄")+"</button>"+
+  '<small>請勿在確認資料入庫前清除本機進度；重新試玩會重設分數及提交編號。</small>'+
+  "</div>";
+}
+async function submitWardGame(){
+ const up=s.upload||{id:"",state:"",error:""};
+ if(up.state==="sending"||up.state==="sent")return;
+ const name=$("submitFullName")?.value.trim()||"";
+ const unit=$("submitUnit")?.value.trim()||"";
+ const phase=$("submitPhase")?.value||"試玩";
+ if(!name||!unit){
+  if(typeof window.alert==="function")window.alert("請完整填寫姓名和單位，再提交成績。");
+  const missing=!name?$("submitFullName"):$("submitUnit");
+  if(missing&&typeof missing.focus==="function")missing.focus();
+  return;
+ }
+ const completed=wardFinished();
+ if(!completed&&typeof window.confirm==="function"&&!window.confirm("目前仍有病房主要任務未完成，要以「未完成」狀態送出這次試玩紀錄嗎？"))return;
+ s.identity={fullName:name,unit,phase};
+ if(!up.id)up.id="NS-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,14);
+ up.state="sending";up.error="";s.upload=up;save();render();
+ const values=s.score||{};
+ const firstUnsafe=(s.log||[]).filter(x=>String(x.label||"").startsWith("首次決策／")&&String(x.value||"").startsWith("0 分")).length;
+ const corrections=(s.log||[]).filter(x=>String(x.label||"").startsWith("補充／")||String(x.label||"").includes("補救")).length;
+ const payload={
+  type:"nursestart_ward_v1",submissionId:up.id,
+  learnerCode:name,fullName:name,unit,phase,
+  status:completed?"完成":"未完成",
+  version:"ward-v6",durationSeconds:Math.max(0,Math.round((Date.now()-(s.startedAt||Date.now()))/1000)),
+  scores:{...values},
+  visitedBeds:{bed217:!!s.b217.visited,bed219:!!s.b219.visited,bed220:!!s.b220.visited},
+  events:(s.log||[]).slice(0,500).map(x=>({time:x.time,place:x.place,label:x.label,value:x.value})),
+  firstUnsafeCount:firstUnsafe,correctedCount:corrections
+ };
+ try{
+  // The deployed Apps Script processes text/plain JSON in doPost().
+  // no-cors avoids a cross-origin preflight but cannot expose the server response.
+  await fetch(SUBMIT_URL,{
+   method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=UTF-8"},
+   body:JSON.stringify(payload),redirect:"follow"
+  });
+  up.state="sent";
+ }catch(err){
+  up.state="failed";up.error=String(err?.message||err||"傳送失敗");
+ }
+ save();if(s.place==="end")render();
+}
 function renderEnd(){
  header("巡房回顧｜臨床決策紀錄","");
  const unseen=[["bed217","217 床",!!s.b217.visited],["bed219","219 床",!!s.b219.visited],["bed220","220 床",!!s.b220.visited]].filter(x=>!x[2]);
- let h=(unseen.length?noteBox("<b>還有病床尚未探視：</b>"+unseen.map(x=>x[1]).join("、")+"。請先完成巡房，才能視為全部結束。")+choices(...unseen.map(x=>btn("前往 "+x[1], "go:"+x[0]))):"")+scoreSummary()+choices(btn("回到病房繼續值班","end:continue"),btn("複製學習紀錄","end:copy"),btn("從頭重新試玩","end:reset"));
+ let h=(unseen.length?noteBox("<b>還有病床尚未探視：</b>"+unseen.map(x=>x[1]).join("、")+"。請先完成巡房，才能視為全部結束。")+choices(...unseen.map(x=>btn("前往 "+x[1], "go:"+x[0]))):"")+scoreSummary()+submissionUI()+choices(btn("回到病房繼續值班","end:continue"),btn("複製學習紀錄","end:copy"),btn("從頭重新試玩","end:reset"));
  const l=s.log.slice(-16).map(o=>'<div class="result-row"><span>'+o.time+"　"+o.label+"</span><span>"+o.value+"</span></div>").join("");
  return h+'<div class="note"><b>最近操作紀錄</b>'+l+"</div>";
 }
@@ -674,6 +755,7 @@ function act(token){
   tick(2);render();return;
  }
  if(a==="end"){
+  if(b==="submit"){submitWardGame();return}
   if(b==="review"){s.place="end";render();return}
   if(b==="continue"){s.place=s.firstPlace||"desk";render();return}
   if(b==="copy"){
@@ -681,7 +763,7 @@ function act(token){
    const text=rows.join("\n");if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).catch(()=>{});}
    return;
   }
-  if(b==="reset"){if(!window.confirm||window.confirm("要重新試玩並清除本機進度嗎？")){s=INIT();save();render()}return}
+  if(b==="reset"){if(!window.confirm||window.confirm("要重新試玩並清除本機進度嗎？")){s=INIT();$("startFullName").value="";$("startUnit").value="";save();render()}return}
  }
  if(a==="close"){closeModal();render();return}
 }
@@ -689,7 +771,7 @@ function initialize(){
  $("enterGame").addEventListener("click",start);
  $("enterGame2").addEventListener("click",start);
  $("backHome").addEventListener("click",()=>{$("home").classList.remove("hidden");$("game").classList.add("hidden")});
- $("restartWard").addEventListener("click",()=>{if(!window.confirm||window.confirm("重新試玩將清除本次進度與分數，確定嗎？")){s=INIT();save();render()}});
+ $("restartWard").addEventListener("click",()=>{if(!window.confirm||window.confirm("重新試玩將清除本次進度與分數，確定嗎？")){s=INIT();$("startFullName").value="";$("startUnit").value="";save();render()}});
  $("scene").addEventListener("click",e=>{const x=e.target.closest("[data-act]");if(x&&!x.disabled)act(x.dataset.act)});
  $("ward").addEventListener("click",e=>{const x=e.target.closest("[data-spot]");if(x)move(x.dataset.spot)});
  $("cart").addEventListener("click",()=>openModal("cart"));
@@ -699,10 +781,27 @@ function initialize(){
  document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 }
 function start(){
+ const name=$("startFullName").value.trim(),unit=$("startUnit").value.trim();
+ if(!name||!unit){
+  $("startIdentityError").textContent="請先填寫姓名及單位，才能進入病房。";
+  const missing=!name?$("startFullName"):$("startUnit");
+  if(typeof missing.focus==="function")missing.focus();
+  return;
+ }
+ $("startIdentityError").textContent="";
  if(!restore())s=INIT();
+ s.identity={fullName:name,unit,phase:s.identity?.phase||"試玩"};
+ if(!s.startedAt)s.startedAt=Date.now();
  $("home").classList.add("hidden");$("game").classList.remove("hidden");
  document.title="Ward Quest｜NurseStart Lab V6";render();
  try{window.scrollTo({top:0,behavior:"instant"})}catch(e){}
 }
 initialize();
+try{
+ const previous=JSON.parse(localStorage.getItem(KEY)||"null");
+ if(previous?.identity){
+  $("startFullName").value=previous.identity.fullName||"";
+  $("startUnit").value=previous.identity.unit||"";
+ }
+}catch(e){}
 })();
