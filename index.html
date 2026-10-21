@@ -162,6 +162,58 @@
 .submit-state{margin-top:12px;background:#edf4ec;color:#193f34;border-left:4px solid #6f9a7b;padding:12px 14px;line-height:1.75;font-size:14px}
 .submit-state.warning{background:#fff4de;color:#643d1e;border-color:#c39b47}
 @media(max-width:650px){.identity-intake-fields,.submit-identity-grid{grid-template-columns:1fr}.identity-intake{padding:14px;margin:14px 0}.submit-identity{padding:13px}}
+
+/* NurseStart Lab 217 · clinical chart visual design (first-bed prototype) */
+.ward .bed-map-state{position:absolute;z-index:5;right:6%;top:6%;background:#e9eeeb;color:#587079;border:1px solid #b4c8c3;padding:4px 6px;min-width:41px;text-align:center;font-size:clamp(9px,.95vw,12px);font-weight:750;line-height:1.2;white-space:nowrap;box-shadow:1px 2px 0 #203f4818}
+.ward .bed-map-state.is-active{background:#dbf2e6;border-color:#6b9c8e;color:#1f574b}
+.ward .bed-map-state.has-followup{background:#fff0ce;border-color:#d6b477;color:#6e5220}
+.ward .room-left:has(.bed-map-state.is-active){border-color:#4b8589;box-shadow:inset 0 0 0 2px #bee5dd}
+.console.bed217-active{background:#f7f7f2;border:1px solid #9baba8;color:#263b42;box-shadow:0 8px 0 #0d18221e}
+.console.bed217-active .console-head{background:#203944;color:#f7fbf9;padding:18px 22px 17px;position:relative;border-bottom:5px solid #8cc7b9}
+.console.bed217-active .console-head:before{content:"BED 217  /  CLINICAL ASSESSMENT";display:block;font-size:11px;font-weight:750;letter-spacing:.15em;color:#c8dfd7;margin-bottom:7px}
+.console.bed217-active .console-head h2{font-size:clamp(23px,2.5vw,30px);line-height:1.25;margin:0}
+.console.bed217-active .console-body{padding:21px 22px 27px;background:#f7f7f2}
+.bed217-view{color:#263b42;font-size:16px}
+.bed217-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 25px}
+.bed217-tool{border:1px solid #c6d5cf;border-bottom:3px solid #8baea7;background:#fff;min-height:78px;color:#263f46;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;padding:11px 5px;font-size:14px;font-weight:800;line-height:1.2;cursor:pointer}
+.bed217-tool:hover,.bed217-tool:focus-visible{background:#e7f2ef;border-color:#487d79;outline-offset:3px}
+.tool-mark{width:27px;height:27px;display:inline-flex;align-items:center;justify-content:center;background:#e6eee8;color:#27564e;border:1px solid #a2c4b5;font-size:14px;font-weight:900}
+.tool-book{background:#edf0e5;color:#666f42;border-color:#b4bca2}
+.tool-med{background:#fff1df;color:#986536;border-color:#dfbc96}
+.bed217-section-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #b8c6c1;padding-bottom:9px;margin-bottom:13px;color:#677c7c;font-size:13px;font-weight:850;letter-spacing:.025em}
+.bed217-section-heading span:first-child{color:#2b4d58}
+.bed217-section-heading span:last-child{background:#e9efec;color:#42635d;padding:4px 9px}
+.bed217-statement{padding:20px 21px 22px;border:1px solid #d0d9d4;border-left:6px solid #7ca99e;background:#fff;color:#273b43;min-height:128px}
+.bed217-statement.is-observation{background:#edf4f0;border-color:#abc7bd;border-left-color:#367971}
+.bed217-statement.is-quiz{background:#f7f4ec;border-color:#d5ccaf;border-left-color:#b58c50}
+.bed217-speaker{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:850;color:#2d5656;letter-spacing:.025em;margin-bottom:12px}
+.speaker-symbol{display:inline-flex;justify-content:center;align-items:center;width:29px;height:29px;border-radius:50%;background:#264451;color:#fff;font-size:13px;font-weight:800}
+.bed217-statement.is-observation .speaker-symbol{background:#397c72}
+.bed217-statement.is-quiz .speaker-symbol{background:#aa844d}
+.bed217-statement p{font-size:clamp(18px,1.55vw,21px);line-height:1.83;font-weight:500;letter-spacing:.01em;margin:0;white-space:normal;overflow-wrap:anywhere}
+.bed217-alert{background:#fff2de;color:#644220;border-left:6px solid #ca8c45}
+.bed217-alert strong{color:#754019}
+.bed217-followup{display:flex;align-items:center;gap:8px;margin:15px 0 3px;padding:10px 12px;border-left:3px solid #b69c5e;background:#f1eadd;color:#584b37;font-size:14px;font-weight:650;line-height:1.4}
+.bed217-followup>span{font-size:9px;color:#9c7e3e}
+.bed217-answer-heading{font-size:15px;font-weight:850;margin:22px 0 9px;color:#294851}
+.bed217-active .bed217-view .choices{margin:0 0 6px;gap:10px}
+.bed217-active .bed217-view .choice{font-size:16px;font-weight:580;line-height:1.6;padding:17px 16px;min-height:66px;color:#28404a;border:2px solid #d0dad6;background:#fff;box-shadow:2px 3px 0 #c4cfcb38;align-items:center;border-radius:2px}
+.bed217-active .bed217-view .choice:before{color:#366a6e;font-size:18px;content:"→";margin-top:0}
+.bed217-active .bed217-view .choice:hover,.bed217-active .bed217-view .choice:focus-visible{background:#e9f4ef;border-color:#397f76;outline:2px solid #9acfc0;outline-offset:1px}
+.bed217-active .bed217-view .choice:active{transform:translateY(1px);box-shadow:none}
+.bed217-active .note.warning{background:#fff3e2;color:#553c27}
+@media(max-width:650px){
+ .ward .bed-map-state{font-size:10px;min-width:0;padding:3px 4px}
+ .console.bed217-active .console-head{padding:17px 16px}
+ .console.bed217-active .console-head:before{font-size:10px}
+ .console.bed217-active .console-body{padding:16px 14px 22px}
+ .bed217-tools{gap:5px;margin-bottom:22px}
+ .bed217-tool{min-height:70px;font-size:13px;padding:9px 3px}
+ .tool-mark{width:25px;height:25px}
+ .bed217-statement{padding:16px 15px 20px;min-height:115px}
+ .bed217-statement p{font-size:18px;line-height:1.75}
+ .bed217-active .bed217-view .choice{font-size:16px;padding:15px 13px;min-height:60px}
+}
 </style>
 </head>
 <body>
@@ -180,7 +232,7 @@
 </div>
 <div class="game hidden" id="game">
 <div class="gamebar"><button class="back" id="backHome">← 回平台首頁</button><button class="back" id="restartWard" type="button" title="清除本次試玩進度，從接班開始">重新試玩</button><span class="gamebrand">NURSESTART <span style="color:var(--lime)">LAB.</span></span><div class="gamestatus"><span id="clock">09:00</span></div></div>
-<div class="game-layout"><section class="ward-wrap"><div class="ward" id="ward"><div class="room room-left"><span class="room-label">217 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket"></div></div><div class="ivstand"></div></div><div class="room room-right"><span class="room-label">219 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#a2c5a7"></div></div><div class="ivstand"></div></div><div class="room room-third"><span class="room-label">220 床</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#e3d2ab"></div></div></div><div class="zone zone-nurse"><span class="zone-label">護理站 / 電腦</span><div class="monitor"></div></div><div class="nurse" id="nurse" style="left:50%;top:53%" aria-label="穿著藍色背心、白色制服與長褲的女性護理師">
+<div class="game-layout"><section class="ward-wrap"><div class="ward" id="ward"><div class="room room-left"><span class="room-label">217 床</span><span class="bed-map-state" id="bed217State">未巡視</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket"></div></div><div class="ivstand"></div></div><div class="room room-right"><span class="room-label">219 床</span><span class="bed-map-state" id="bed219State">未巡視</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#a2c5a7"></div></div><div class="ivstand"></div></div><div class="room room-third"><span class="room-label">220 床</span><span class="bed-map-state" id="bed220State">未巡視</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#e3d2ab"></div></div></div><div class="zone zone-nurse"><span class="zone-label">護理站 / 電腦</span><div class="monitor"></div></div><div class="nurse" id="nurse" style="left:50%;top:53%" aria-label="穿著藍色背心、白色制服與長褲的女性護理師">
 <svg viewBox="0 0 72 116" width="72" height="116" role="img" aria-label="有護理識別證、藍色背心及長褲的年輕女護理師">
 <ellipse cx="37" cy="110" rx="25" ry="4" fill="#203c43" opacity=".24"/>
 <path d="M23 65L22 102L34 102L35 76L40 102L52 102L49 65Z" fill="#274f71" stroke="#24455a" stroke-width="2"/>
@@ -208,9 +260,9 @@
 <path d="M16 74Q17 75 19 76" stroke="#e9bca0" stroke-width="4" stroke-linecap="round"/>
 </svg></div>
 <button class="cart" id="cart" type="button" title="開啟護理工作車：查看此床醫囑" aria-label="開啟護理工作車" style="left:57%;top:54%">
-<span class="cart-screen">工作車</span><span class="cart-top"></span><span class="cart-mid"></span><span class="cart-leg"></span><span class="wheel one"></span><span class="wheel two"></span></button><button class="clickspot spot217" data-spot="bed217">去 217 床</button><button class="clickspot spot219" data-spot="bed219">去 219 床</button><button class="clickspot spot220" data-spot="bed220">去 220 床</button><button class="clickspot spotdesk" data-spot="desk">查閱資料</button><div class="bell hidden" id="bell">🔔 219 床按鈴</div></div></section><section class="console" aria-live="polite"><div class="console-head"><h2 id="ctitle">接班開始</h2><p class="sub" id="csub"></p></div><div class="console-body" id="scene"></div></section></div>
+<span class="cart-screen">工作車</span><span class="cart-top"></span><span class="cart-mid"></span><span class="cart-leg"></span><span class="wheel one"></span><span class="wheel two"></span></button><button class="clickspot spot217" data-spot="bed217">去 217 床</button><button class="clickspot spot219" data-spot="bed219">去 219 床</button><button class="clickspot spot220" data-spot="bed220">去 220 床</button><button class="clickspot spotdesk" data-spot="desk">查閱資料</button><div class="bell hidden" id="bell">🔔 219 床按鈴</div></div></section><section class="console" id="wardConsole" aria-live="polite"><div class="console-head"><h2 id="ctitle">接班開始</h2><p class="sub" id="csub"></p></div><div class="console-body" id="scene"></div></section></div>
 </div>
 <div class="toast hidden" id="toast" role="status"></div><div class="overlay hidden" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panelTitle"><div class="panel"><div class="panel-top"><h2 id="panelTitle"></h2><button type="button" id="closePanel" aria-label="關閉視窗">✕</button></div><div class="panel-body" id="panelBody"></div></div></div>
-<script src="game-v6.js?v=20261021-6" defer></script>
+<script src="game-v6.js?v=20261022-1" defer></script>
 </body>
 </html>
