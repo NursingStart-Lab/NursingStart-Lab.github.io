@@ -132,6 +132,49 @@ function renderStart(){
  return box("交班護理師","217 床尚有給藥需要確認；219 床正在接受輸液；220 床是中風後復健病人。")+
  choices(btn("前往 217 床｜了解病況","go:bed217"),btn("前往 219 床｜檢查輸液","go:bed219"),btn("前往 220 床｜復健照護","go:bed220"),btn("先到護理站看紀錄","go:desk"));
 }
+
+function bed217Stage(v){
+ const f=v.focus||"start";
+ if(f==="medQuiz"||f==="medQuizAnswer")return "藥物查證";
+ if(f==="feedback")return "重新評估";
+ if(v.aspirReport||f==="aspirinPlan"||f==="done")return "後續追蹤";
+ if(v.stool||f==="stool"||f==="stoolDetail"||f==="bruise"||f==="vital"||f==="aspReview")return "用藥風險評估";
+ if(v.bg||f==="bg"||f==="glucoseUnsafe"||f==="food")return "血糖處置";
+ if(v.objective||f==="objective"||f==="meal")return "床旁評估";
+ return "了解主訴";
+}
+function bed217Tools(v){
+ const focus=v.focus||"start",stage=bed217Stage(v);
+ const action=focus==="feedback"?"評估提醒":focus==="medQuizAnswer"?"查證結果":"床旁互動";
+ return '<div class="bed217-tools" aria-label="217 床資料查閱">'+
+ '<button type="button" data-act="modal:handoff217" class="bed217-tool"><span class="tool-mark tool-book" aria-hidden="true">交</span><span>交班內容</span></button>'+
+ '<button type="button" data-act="modal:ehr217" class="bed217-tool"><span class="tool-mark tool-sheet" aria-hidden="true">醫</span><span>目前醫囑</span></button>'+
+ '<button type="button" data-act="modal:leaflet" class="bed217-tool"><span class="tool-mark tool-med" aria-hidden="true">藥</span><span>藥物仿單</span></button>'+
+ '</div><div class="bed217-section-heading"><span>'+action+'</span><span>'+stage+'</span></div>';
+}
+function bed217Status(){
+ const v=s.b217;
+ if(!v.visited)return "未巡視";
+ if(v.aspirReport)return "待追蹤";
+ if(v.bg&&!v.recheck)return "待追蹤";
+ if(v.symptom)return "評估中";
+ return "已探視";
+}
+function refreshWardMap(){
+ const states=[
+  ["bed217State",bed217Status(),s.place==="bed217"],
+  ["bed219State",s.b219.visited?(s.b219.injury&&!s.b219.injuryFollow?"待處理":"已探視"):"未巡視",s.place==="bed219"],
+  ["bed220State",s.b220.visited?(s.b220.report?"待追蹤":"評估中"):"未巡視",s.place==="bed220"]
+ ];
+ for(const [id,label,active] of states){
+  const node=$(id);
+  if(!node)continue;
+  node.textContent=label;
+  node.className="bed-map-state"+(active?" is-active":"")+(label==="待處理"||label==="待追蹤"?" has-followup":"");
+ }
+ const consoleNode=$("wardConsole");
+ if(consoleNode)consoleNode.classList.toggle("bed217-active",s.place==="bed217");
+}
 function render217(){
  const v=s.b217;v.visited=true;
  header("217 床｜臨床評估與給藥","");
@@ -203,12 +246,21 @@ function render217(){
   a=[btn("回到 217 床複測血糖、追蹤症狀","217:recheck"),
      btn("沒有必要複測，直接繼續常規給藥","217:wrongRecheck")];
  }
- let h=focus==="feedback"?
-  '<div class="assessment-alert" role="alert"><strong>目前判斷需要補充評估</strong><p>'+line+'</p></div>':
-  box(["objective","bg","vital"].includes(focus)?"床旁評估結果":focus==="medQuiz"?"藥物作用配對":"217 床病人",line);
- if(v.bg&&focus!=="bg"&&focus!=="start"&&focus!=="feedback")
-  h+='<div class="interaction-note">已測血糖 68 mg/dL'+(v.recheck?"｜複測 "+v.recheckValue+" mg/dL":"｜需要追蹤")+"</div>";
- return h+(a.length?choices(...a):"");
+ const resultState=["objective","bg","vital","recheck"].includes(focus);
+ const quizState=focus==="medQuiz"||focus==="medQuizAnswer";
+ const patientLabel=quizState?"藥物作用判斷":resultState?"床旁評估結果":"217 床病人";
+ const body=focus==="feedback"?
+  '<section class="assessment-alert bed217-alert" role="alert"><strong>需要補充評估</strong><p>'+line+'</p></section>':
+  '<section class="bed217-statement '+(resultState?"is-observation":quizState?"is-quiz":"is-patient")+'">'+
+   '<div class="bed217-speaker"><span class="speaker-symbol" aria-hidden="true">'+(resultState?"觀":quizState?"藥":"人")+'</span>'+patientLabel+'</div>'+
+   '<p>'+line+'</p></section>';
+ let follow="";
+ if(v.bg&&focus!=="bg"&&focus!=="start"&&focus!=="feedback"){
+  follow='<div class="bed217-followup"><span aria-hidden="true">●</span>血糖 68 mg/dL'+
+   (v.recheck?" · 已複測 "+v.recheckValue+" mg/dL":" · 尚待複測")+"</div>";
+ }
+ const actionArea=a.length?'<div class="bed217-answer-heading">你的下一步</div>'+choices(...a):"";
+ return '<div class="bed217-view">'+bed217Tools(v)+body+follow+actionArea+"</div>";
 }
 function render219(){
  const v=s.b219;v.visited=true;
@@ -400,7 +452,7 @@ function render(){
  case "end":html=renderEnd();break;default:html=renderStart();
  }
  if(s.place!=="start"&&s.place!=="end")html+=status();
- $("scene").innerHTML=html;save();
+ $("scene").innerHTML=html;refreshWardMap();save();
 }
 function openModal(kind){
  modal=kind;$("overlay").classList.remove("hidden");
