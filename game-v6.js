@@ -22,7 +22,7 @@ const INIT=()=>({
  b220:{visited:false,line:"",focus:"start",onset:false,score:false,triggers:false,arm:false,exam:false,positioned:false,
   acetViewed:false,report:false,prompted:false,firstPremature:false,follow:false},
  abx:{order:false,culture:false,allergy:false,renal:false,decision:"",step:0,wrong:[],finished:false},
- lastDoctor:"",gameEnded:false
+ lastDoctor:"",gameEnded:false,bellPromptShown:false,freeText:{bell:"",reflection:""}
 });
 let s=INIT(),modal="";
 function save(){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
@@ -34,6 +34,8 @@ function restore(){
    if(!d.identity)d.identity={fullName:"",unit:"",phase:"試玩"};
    if(!d.upload)d.upload={id:"",state:"",error:""};
    if(!Number.isFinite(d.startedAt))d.startedAt=0;
+   if(!d.freeText)d.freeText={bell:"",reflection:""};
+   if(typeof d.bellPromptShown!=="boolean")d.bellPromptShown=false;
    if(!g.medQuiz)g.medQuiz={index:0,firstCorrect:0,answer:"",done:false};
    if(!Number.isFinite(g.gMistakes))g.gMistakes=0;
    if(!Number.isFinite(g.aMistakes))g.aMistakes=0;
@@ -433,10 +435,20 @@ async function submitWardGame(){
  }
  save();if(s.place==="end")render();
 }
+
+function reflectionUI(){
+ return '<section class="learner-reflection">'+
+  '<h3>你的臨床判斷</h3>'+
+  '<label for="clinicalReflection">這次巡房中，哪一個線索最影響你的決定？為什麼？</label>'+
+  '<textarea id="clinicalReflection" maxlength="260" rows="3" placeholder="用你自己的話描述，不必照標準答案">'+safeHTML(s.freeText?.reflection||"")+'</textarea>'+
+  '<p>自由填寫；儲存後將與首次決策及操作歷程一起保留，供教師引導回顧。</p>'+
+  '<button class="choice" type="button" data-act="end:saveReflection">儲存我的想法</button>'+
+  '</section>';
+}
 function renderEnd(){
  header("巡房回顧｜臨床決策紀錄","");
  const unseen=[["bed217","217 床",!!s.b217.visited],["bed219","219 床",!!s.b219.visited],["bed220","220 床",!!s.b220.visited]].filter(x=>!x[2]);
- let h=(unseen.length?noteBox("<b>還有病床尚未探視：</b>"+unseen.map(x=>x[1]).join("、")+"。請先完成巡房，才能視為全部結束。")+choices(...unseen.map(x=>btn("前往 "+x[1], "go:"+x[0]))):"")+scoreSummary()+submissionUI()+choices(btn("回到病房繼續值班","end:continue"),btn("複製學習紀錄","end:copy"),btn("從頭重新試玩","end:reset"));
+ let h=(unseen.length?noteBox("<b>還有病床尚未探視：</b>"+unseen.map(x=>x[1]).join("、")+"。請先完成巡房，才能視為全部結束。")+choices(...unseen.map(x=>btn("前往 "+x[1], "go:"+x[0]))):"")+scoreSummary()+reflectionUI()+submissionUI()+choices(btn("回到病房繼續值班","end:continue"),btn("複製學習紀錄","end:copy"),btn("從頭重新試玩","end:reset"));
  const l=s.log.slice(-16).map(o=>'<div class="result-row"><span>'+o.time+"　"+o.label+"</span><span>"+o.value+"</span></div>").join("");
  return h+'<div class="note"><b>最近操作紀錄</b>'+l+"</div>";
 }
@@ -461,7 +473,14 @@ function openModal(kind){
  modal=kind;$("overlay").classList.remove("hidden");
  drawModal();
 }
-function closeModal(){modal="";$("overlay").classList.add("hidden")}
+function closeModal(){
+ const wasGlucoseReply=modal==="reply:glucose";
+ modal="";$("overlay").classList.add("hidden");
+ if(wasGlucoseReply&&s.bell&&!s.bellHandled&&!s.bellPromptShown){
+  s.bellPromptShown=true;
+  openModal("bellNotice");
+ }
+}
 function doctorReport(kind){
  const g=s.b217,v=s.b220;
  if(kind==="glucose"){
@@ -523,7 +542,17 @@ function doctorReport(kind){
 function drawModal(){
  let html="",title="";
  const p=s.place,g=s.b217,i=s.b219,w=s.b220,a=s.abx;
- if(modal==="cart"){
+ if(modal==="bellNotice"){
+  title="219 床｜呼叫鈴";
+  html='<div class="bell-notice-hero" role="alert">'+
+       '<span class="bell-visual" aria-hidden="true">🔔</span>'+
+       '<div><strong>219 床呼叫鈴響起</strong><p>你正在處理 217 床的工作，現在又有另一床需要協助。</p></div></div>'+
+       '<label class="bell-thought-label" for="bellReason">你現在會怎麼安排？請寫下一句判斷理由（可選填）</label>'+
+       '<textarea id="bellReason" maxlength="180" rows="3" placeholder="寫下你當下的想法，不必使用標準答案">'+safeHTML(s.freeText?.bell||"")+'</textarea>'+
+       '<p class="bell-thought-tip">這句話會連同你接下來的選擇存入教師後台，作為課後討論依據。</p>'+
+       pbtn("安排 217 床後續血糖追蹤，並前往確認 219 床","bell:assign")+
+       pbtn("先前往 219 床查看，再回頭確認 217 床追蹤安排","bell:go");
+ }else if(modal==="cart"){
   title="護理工作車";
   if(p==="bed219"){
     html='<div class="record-head">219 床｜輸液醫囑</div><table class="record">'+
@@ -732,6 +761,16 @@ function report(kind){
 }
 function act(token){
  const p=token.split(":"),a=p[0],b=p[1];if(!a)return;
+ if(a==="bell"){
+  const thought=String($("bellReason")?.value||"").trim().slice(0,180);
+  if(!s.freeText)s.freeText={bell:"",reflection:""};
+  s.freeText.bell=thought;
+  if(thought)note("學員思維｜跨床處置",thought);
+  note("呼叫鈴決策",b==="assign"?"安排217床追蹤，再查看219床":"先查看219床，再回頭安排217床追蹤");
+  if(b==="assign"){s.handoff=true;note("217追蹤交接","安排血糖複測與症狀追蹤");}
+  if(!["assign","go"].includes(b))return;
+  move("bed219");return;
+ }
  if(a==="go"){move(b);return}
  if(a==="217"){do217(b);return}
  if(a==="219"){do219(b);return}
@@ -816,7 +855,24 @@ function act(token){
   tick(2);render();return;
  }
  if(a==="end"){
-  if(b==="submit"){submitWardGame();return}
+  if(b==="saveReflection"){
+   const thought=String($("clinicalReflection")?.value||"").trim().slice(0,260);
+   if(!s.freeText)s.freeText={bell:"",reflection:""};
+   if(thought!==s.freeText.reflection){
+    s.freeText.reflection=thought;
+    if(thought)note("學員思維｜課後反思",thought);
+   }
+   render();return;
+  }
+  if(b==="submit"){
+   const thought=String($("clinicalReflection")?.value||"").trim().slice(0,260);
+   if(!s.freeText)s.freeText={bell:"",reflection:""};
+   if(thought&&thought!==s.freeText.reflection){
+    s.freeText.reflection=thought;
+    note("學員思維｜課後反思",thought);
+   }
+   submitWardGame();return;
+  }
   if(b==="review"){s.place="end";render();return}
   if(b==="continue"){s.place=s.firstPlace||"desk";render();return}
   if(b==="copy"){
