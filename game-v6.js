@@ -891,6 +891,16 @@ function initialize(){
  $("restartWard").addEventListener("click",()=>{if(!window.confirm||window.confirm("重新試玩將清除本次進度與分數，確定嗎？")){s=INIT();$("startFullName").value="";$("startUnit").value="";save();render()}});
  $("scene").addEventListener("click",e=>{const x=e.target.closest("[data-act]");if(x&&!x.disabled)act(x.dataset.act)});
  $("ward").addEventListener("click",e=>{const x=e.target.closest("[data-spot]");if(x)move(x.dataset.spot)});
+ $("ward").addEventListener("keydown",e=>{
+  if(e.key!=="Enter"&&e.key!==" ")return;
+  const target=e.target.closest('[data-spot][role="button"]');
+  if(!target)return;
+  e.preventDefault();move(target.dataset.spot);
+ });
+ $("wardControls").addEventListener("click",e=>{
+  const target=e.target.closest("[data-jump]");
+  if(target)move(target.dataset.jump);
+ });
  $("cart").addEventListener("click",()=>openModal("cart"));
  $("panelBody").addEventListener("click",e=>{const x=e.target.closest("[data-pa]");if(x&&!x.disabled)act(x.dataset.pa)});
  $("closePanel").addEventListener("click",closeModal);
