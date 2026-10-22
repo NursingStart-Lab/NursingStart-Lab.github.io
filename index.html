@@ -239,6 +239,13 @@
  .learner-reflection{padding:14px}
 }
 @media(prefers-reduced-motion:reduce){.bell-visual{animation:none}}
+
+/* Uniform clarity: unmistakable real-world nurse attire at small map size */
+.ward .nurse{width:76px;height:120px;z-index:9;pointer-events:none;filter:drop-shadow(2px 4px 1px #1b33444a)}
+.ward .nurse svg{width:76px;height:121px;display:block;overflow:visible}
+.ward .nurse .nurse-label{position:absolute;z-index:10;top:-18px;left:50%;transform:translateX(-50%);font:800 12px/1.2 system-ui,"Noto Sans TC",sans-serif;white-space:nowrap;padding:4px 6px;color:#f6fffa;background:#244a5d;border:1px solid #e5f1ed;box-shadow:2px 3px 0 #19343c31}
+.ward .nurse .nurse-mark{color:#b6ecde;font-size:11px}
+@media(max-width:650px){.ward .nurse{transform:translate(-50%,-55%) scale(.8);width:76px;height:120px}.ward .nurse svg{width:76px;height:121px}.ward .nurse .nurse-label{font-size:12px}}
 </style>
 </head>
 <body>
@@ -257,32 +264,52 @@
 </div>
 <div class="game hidden" id="game">
 <div class="gamebar"><button class="back" id="backHome">← 回平台首頁</button><button class="back" id="restartWard" type="button" title="清除本次試玩進度，從接班開始">重新試玩</button><span class="gamebrand">NURSESTART <span style="color:var(--lime)">LAB.</span></span><div class="gamestatus"><span id="clock">09:00</span></div></div>
-<div class="game-layout"><section class="ward-wrap"><div class="ward" id="ward"><div class="room room-left"><span class="room-label">217 床</span><span class="bed-map-state" id="bed217State">未巡視</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket"></div></div><div class="ivstand"></div></div><div class="room room-right"><span class="room-label">219 床</span><span class="bed-map-state" id="bed219State">未巡視</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#a2c5a7"></div></div><div class="ivstand"></div></div><div class="room room-third"><span class="room-label">220 床</span><span class="bed-map-state" id="bed220State">未巡視</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#e3d2ab"></div></div></div><div class="zone zone-nurse"><span class="zone-label">護理站 / 電腦</span><div class="monitor"></div></div><div class="nurse" id="nurse" style="left:50%;top:53%" aria-label="穿著藍色背心、白色制服與長褲的女性護理師">
-<svg viewBox="0 0 72 116" width="72" height="116" role="img" aria-label="有護理識別證、藍色背心及長褲的年輕女護理師">
-<ellipse cx="37" cy="110" rx="25" ry="4" fill="#203c43" opacity=".24"/>
-<path d="M23 65L22 102L34 102L35 76L40 102L52 102L49 65Z" fill="#274f71" stroke="#24455a" stroke-width="2"/>
-<path d="M21 101H35L36 109H19Z M40 101H53L55 109H39Z" fill="#eef3ec" stroke="#345263" stroke-width="2"/>
-<path d="M21 43L13 70L18 76L25 69L31 51Z" fill="#e9bca0" stroke="#8b6c5d"/>
-<path d="M50 43L61 68L56 75L47 67L42 52Z" fill="#e9bca0" stroke="#8b6c5d"/>
-<path d="M20 41Q35 34 52 41L56 76H18Z" fill="#f9fcf8" stroke="#557283" stroke-width="2"/>
-<path d="M20 41L29 38L34 71L18 75Z M43 38L53 42L56 75L39 71Z" fill="#5e91b4" stroke="#356582" stroke-width="1.5"/>
-<path d="M29 40L35 48L42 40L39 37H32Z" fill="#ffffff" stroke="#b4c8c9"/>
-<path d="M28 41Q33 47 30 54Q29 59 33 62 M44 41Q39 47 42 54Q42 59 38 62" fill="none" stroke="#254f60" stroke-width="1.8"/>
-<circle cx="36" cy="63" r="3.6" fill="#a9c5ce" stroke="#355b6b" stroke-width="1.8"/>
-<path d="M31 36V42Q36 48 42 41V35" fill="#edbfa5" stroke="#b5856f"/>
-<path d="M49 15Q66 22 62 43Q55 43 51 36Z" fill="#47332f"/>
-<ellipse cx="35" cy="22" rx="16" ry="19" fill="#47332f"/>
-<ellipse cx="36" cy="25" rx="13" ry="16" fill="#f2c5a9"/>
-<path d="M22 21Q20 7 33 5Q50 4 51 21Q43 15 37 14Q31 21 23 20Z" fill="#47332f"/>
-<path d="M48 14Q58 19 54 31L48 34Z" fill="#47332f"/>
-<circle cx="31" cy="25" r="1.4" fill="#493c3a"/><circle cx="41" cy="25" r="1.4" fill="#493c3a"/>
-<path d="M32 33Q36 36 40 33" fill="none" stroke="#a66d69" stroke-width="1.4" stroke-linecap="round"/>
-<rect x="43" y="45" width="11" height="13" rx="1.5" fill="#ffffff" stroke="#345c75" stroke-width="1.2"/>
-<path d="M48.5 47V53M45.5 50H51.5" stroke="#437e84" stroke-width="1.5"/>
-<text x="48.5" y="57" text-anchor="middle" fill="#2b5361" font-size="4" font-weight="bold">護理</text>
-<path d="M16 62L7 63V83L22 80L22 63Z" fill="#e4edf0" stroke="#496775" stroke-width="2"/>
-<path d="M12 67H19M12 72H19M12 77H17" stroke="#78969e" stroke-width="1.2"/>
-<path d="M16 74Q17 75 19 76" stroke="#e9bca0" stroke-width="4" stroke-linecap="round"/>
+<div class="game-layout"><section class="ward-wrap"><div class="ward" id="ward"><div class="room room-left"><span class="room-label">217 床</span><span class="bed-map-state" id="bed217State">未巡視</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket"></div></div><div class="ivstand"></div></div><div class="room room-right"><span class="room-label">219 床</span><span class="bed-map-state" id="bed219State">未巡視</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#a2c5a7"></div></div><div class="ivstand"></div></div><div class="room room-third"><span class="room-label">220 床</span><span class="bed-map-state" id="bed220State">未巡視</span><div class="bed-shape"><div class="pillow"></div><div class="patient-head"></div><div class="blanket" style="background:#e3d2ab"></div></div></div><div class="zone zone-nurse"><span class="zone-label">護理站 / 電腦</span><div class="monitor"></div></div><div class="nurse" id="nurse" style="left:50%;top:53%" aria-label="年輕女性護理師，著白色護理制服、藍色背心、白色長褲與護士識別證">
+<span class="nurse-label" aria-hidden="true"><span class="nurse-mark">✚</span> 護理師</span>
+<svg viewBox="0 0 100 160" width="100" height="160" role="img" aria-label="身穿白色翻領護士服、深藍色工作背心、白色護士長褲與醫院識別證的女護理師">
+<ellipse cx="51" cy="152" rx="32" ry="5" fill="#244451" opacity=".20"/>
+<!-- straight white nursing trousers, not streetwear -->
+<path d="M30 100 L27 142 Q27 147 33 147 H47 L50 116 L53 147 H69 Q73 147 72 142 L69 100Z" fill="#fbfdfb" stroke="#456877" stroke-width="2.8" stroke-linejoin="round"/>
+<path d="M49.5 112 L49 143 M32 104 L45 104 M55 104 L67 104" fill="none" stroke="#bfd4d6" stroke-width="2"/>
+<!-- closed white clinical shoes -->
+<path d="M28 142 H48 L49 151 Q45 154 22 153 Q21 148 28 142Z" fill="#fff" stroke="#355765" stroke-width="2.7"/>
+<path d="M53 142 H70 Q79 148 75 153 L52 153Z" fill="#fff" stroke="#355765" stroke-width="2.7"/>
+<path d="M26 150 H47 M55 150 H74" stroke="#a3bac2" stroke-width="1.5"/>
+<!-- hospital short sleeves and visible skin hands -->
+<path d="M31 55 Q23 55 19 65 L11 89 L21 94 L35 71Z" fill="#f8fcfb" stroke="#416579" stroke-width="3"/>
+<path d="M69 55 Q77 55 81 65 L90 89 L80 94 L65 71Z" fill="#f8fcfb" stroke="#416579" stroke-width="3"/>
+<path d="M13 86 L21 91 L19 100 Q16 104 11 98 L9 93Z" fill="#efb99e" stroke="#9b705b" stroke-width="1.6"/>
+<path d="M79 91 L87 86 L92 94 Q94 100 88 102 Q82 101 79 97Z" fill="#efb99e" stroke="#9b705b" stroke-width="1.6"/>
+<path d="M14 78L24 81M76 81L86 78" stroke="#4e85a5" stroke-width="3"/>
+<!-- long white nurse uniform: collar, vertical placket and large pockets -->
+<path d="M34 52 Q50 45 66 52 L75 106 Q53 112 25 106 L30 71Z" fill="#fffdf8" stroke="#496c7d" stroke-width="3" stroke-linejoin="round"/>
+<path d="M45 48 L50 60 L54 48 Q61 49 65 53 L55 66 L50 60 L45 66 L35 53Z" fill="#e6f2f3" stroke="#7395a1" stroke-width="1.7" stroke-linejoin="round"/>
+<path d="M50 63V103" stroke="#adc8d1" stroke-width="2"/>
+<circle cx="53" cy="74" r="1.8" fill="#52778a"/><circle cx="53" cy="87" r="1.8" fill="#52778a"/><circle cx="53" cy="100" r="1.8" fill="#52778a"/>
+<path d="M34 87h12v13H34zM57 87h12v13H57z" fill="none" stroke="#a8bdc4" stroke-width="1.8"/>
+<!-- clearly cut navy blue vest, open over the white clinical tunic -->
+<path d="M29 53L39 50L45 67L43 104L28 101L26 77Z" fill="#346b99" stroke="#254f78" stroke-width="2.5"/>
+<path d="M61 50L72 54L75 77L73 102L57 104L55 67Z" fill="#346b99" stroke="#254f78" stroke-width="2.5"/>
+<path d="M36 54L43 70L41 99M64 54L57 70L59 99" fill="none" stroke="#78afd1" stroke-width="1.8"/>
+<!-- substantial, visible clinical ID tag attached to vest -->
+<path d="M66 65V72" stroke="#e4f0f5" stroke-width="2.2"/>
+<rect x="60" y="71" width="19" height="25" rx="2" fill="#f8fcfa" stroke="#274b61" stroke-width="2.2"/>
+<path d="M69.5 76v9M65 80.5h9" stroke="#397fa0" stroke-width="3"/>
+<rect x="64" y="89" width="11" height="2.2" rx="1" fill="#84abb8"/>
+<!-- nursing clipboard held beside uniform -->
+<rect x="4" y="93" width="24" height="34" rx="3" fill="#e6f1ee" stroke="#2e596a" stroke-width="3" transform="rotate(-7 16 110)"/>
+<rect x="10" y="89" width="13" height="7" rx="2" fill="#c0d7dc" stroke="#427081" stroke-width="1.6" transform="rotate(-7 16 110)"/>
+<path d="M10 101h13M10 107h13M10 113h10" stroke="#7e9da5" stroke-width="1.8" transform="rotate(-7 16 110)"/>
+<!-- neck and only one neatly tied low bun -->
+<path d="M43 42v11Q50 62 58 53V42" fill="#edb99a" stroke="#a17c67" stroke-width="1.6"/>
+<circle cx="75" cy="29" r="11" fill="#42332f" stroke="#2b2a30" stroke-width="2"/>
+<path d="M29 26Q30 7 48 7Q72 7 72 29L67 46L33 46Z" fill="#42332f" stroke="#2c2c34" stroke-width="2"/>
+<ellipse cx="50" cy="30" rx="19" ry="22" fill="#f0c4a9" stroke="#986b60" stroke-width="1.5"/>
+<path d="M31 28Q31 7 46 6Q65 4 70 27Q63 25 59 19Q47 28 34 27Z" fill="#42332f"/>
+<path d="M33 25Q27 34 35 45" fill="none" stroke="#42332f" stroke-width="4"/>
+<circle cx="43" cy="32" r="2" fill="#443a39"/><circle cx="58" cy="32" r="2" fill="#443a39"/>
+<path d="M39 27h8M54 27h8" stroke="#59413d" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M46 42Q50 46 55 42" fill="none" stroke="#a56d68" stroke-width="1.7" stroke-linecap="round"/>
 </svg></div>
 <button class="cart" id="cart" type="button" title="開啟護理工作車：查看此床醫囑" aria-label="開啟護理工作車" style="left:57%;top:54%">
 <span class="cart-screen">工作車</span><span class="cart-top"></span><span class="cart-mid"></span><span class="cart-leg"></span><span class="wheel one"></span><span class="wheel two"></span></button><button class="clickspot spot217" data-spot="bed217">去 217 床</button><button class="clickspot spot219" data-spot="bed219">去 219 床</button><button class="clickspot spot220" data-spot="bed220">去 220 床</button><button class="clickspot spotdesk" data-spot="desk">查閱資料</button><div class="bell hidden" id="bell">🔔 219 床按鈴</div></div></section><section class="console" id="wardConsole" aria-live="polite"><div class="console-head"><h2 id="ctitle">接班開始</h2><p class="sub" id="csub"></p></div><div class="console-body" id="scene"></div></section></div>
