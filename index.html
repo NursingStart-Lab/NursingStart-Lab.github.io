@@ -214,6 +214,31 @@
  .bed217-statement p{font-size:18px;line-height:1.75}
  .bed217-active .bed217-view .choice{font-size:16px;padding:15px 13px;min-height:60px}
 }
+
+/* Central call-bell interruption: readable and actionable even when the nurse is focused on the patient. */
+.bell-notice-hero{display:flex;align-items:flex-start;gap:16px;background:#fff3e8;color:#503b2c;padding:20px;border:2px solid #e6b17b;border-left:7px solid #c66b48;margin:0 0 18px}
+.bell-notice-hero strong{font-size:23px;font-weight:880;color:#703d28}
+.bell-notice-hero p{font-size:16px;margin:8px 0 0;line-height:1.65}
+.bell-visual{font-size:36px;line-height:1;animation:ward-bell-wiggle .8s 2;flex:none}
+@keyframes ward-bell-wiggle{0%,100%{transform:rotate(0deg)}20%{transform:rotate(-13deg)}50%{transform:rotate(13deg)}80%{transform:rotate(-7deg)}}
+.bell-thought-label{display:block;margin:11px 0 8px;font-weight:800;color:#264555;font-size:17px;line-height:1.5}
+#bellReason,#clinicalReflection{display:block;width:100%;min-height:90px;padding:12px 13px;border:1px solid #86a2aa;background:#fff;color:#203640;font:500 16px/1.65 system-ui,"Noto Sans TC","Microsoft JhengHei",sans-serif;border-radius:4px;resize:vertical}
+#bellReason:focus-visible,#clinicalReflection:focus-visible{outline:3px solid #80c1b4;outline-offset:2px}
+.bell-thought-tip{font-size:14px!important;color:#63747b;line-height:1.6!important;margin:9px 0 15px!important}
+.learner-reflection{border:1px solid #78949a;background:#223a48;padding:17px 18px;margin:20px 0}
+.learner-reflection h3{font-size:20px;margin:0 0 10px;color:#def56b}
+.learner-reflection label{display:block;font-weight:800;color:#f5f8f5;font-size:16px;margin-bottom:9px;line-height:1.55}
+.learner-reflection p{color:#cadae0;font-size:14px;line-height:1.65;margin:8px 0 13px}
+.learner-reflection .choice{width:100%;justify-content:center;background:#dff46c!important;color:#18313c!important;font-weight:850;text-align:center;border-color:#dff46c}
+.learner-reflection .choice:before{content:"✎";color:#18313c}
+@media(max-width:650px){
+ .bell-notice-hero{gap:11px;padding:14px;border-left-width:5px}
+ .bell-notice-hero strong{font-size:20px}
+ .bell-visual{font-size:30px}
+ .bell-thought-label{font-size:16px}
+ .learner-reflection{padding:14px}
+}
+@media(prefers-reduced-motion:reduce){.bell-visual{animation:none}}
 </style>
 </head>
 <body>
@@ -263,6 +288,6 @@
 <span class="cart-screen">工作車</span><span class="cart-top"></span><span class="cart-mid"></span><span class="cart-leg"></span><span class="wheel one"></span><span class="wheel two"></span></button><button class="clickspot spot217" data-spot="bed217">去 217 床</button><button class="clickspot spot219" data-spot="bed219">去 219 床</button><button class="clickspot spot220" data-spot="bed220">去 220 床</button><button class="clickspot spotdesk" data-spot="desk">查閱資料</button><div class="bell hidden" id="bell">🔔 219 床按鈴</div></div></section><section class="console" id="wardConsole" aria-live="polite"><div class="console-head"><h2 id="ctitle">接班開始</h2><p class="sub" id="csub"></p></div><div class="console-body" id="scene"></div></section></div>
 </div>
 <div class="toast hidden" id="toast" role="status"></div><div class="overlay hidden" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panelTitle"><div class="panel"><div class="panel-top"><h2 id="panelTitle"></h2><button type="button" id="closePanel" aria-label="關閉視窗">✕</button></div><div class="panel-body" id="panelBody"></div></div></div>
-<script src="game-v6.js?v=20261022-1" defer></script>
+<script src="game-v6.js?v=20261022-2" defer></script>
 </body>
 </html>
